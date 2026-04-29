@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>选股策略 · 三合一金股</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+  min-height: 100vh;
+  color: #212529;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.top-nav {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  height: 56px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+}
+.top-nav a {
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+  font-size: 13px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.top-nav a:hover { color: #fff; background: rgba(255,255,255,0.1); }
+.top-nav a.active { color: #ffd700; background: rgba(255,215,0,0.15); }
+.nav-brand { font-size: 16px; font-weight: 700; color: #ffd700 !important; margin-right: 32px; display: flex; align-items: center; gap: 8px; padding: 0 !important; }
+.nav-brand:hover { background: transparent !important; }
+.nav-spacer { flex: 1; }
+.nav-date { color: rgba(255,255,255,0.5); font-size: 12px; }
+.container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+.hero {
+  text-align: center;
+  padding: 40px 20px 32px;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  border-radius: 20px;
+  margin-bottom: 32px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,215,0,0.1) 0%, transparent 50%); animation: pulse 4s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 0.8; } }
+.hero h1 { font-size: 32px; font-weight: 800; color: #fff; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 12px; position: relative; }
+.hero h1 .emoji { font-size: 36px; }
+.hero .subtitle { color: rgba(255,255,255,0.8); font-size: 15px; display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; position: relative; }
+.hero .subtitle span { background: rgba(255,255,255,0.1); padding: 4px 16px; border-radius: 20px; backdrop-filter: blur(10px); }
+.strategy-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; margin-bottom: 32px; }
+.strategy-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+.strategy-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--accent), var(--accent-light)); }
+.strategy-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.15); border-color: var(--accent); }
+.strategy-card.gold { --accent: #ffd700; --accent-light: #ffed4e; background: linear-gradient(145deg, #fffef5 0%, #fff9e6 100%); }
+.strategy-card.s3 { --accent: #ff6b6b; --accent-light: #ff8e8e; background: linear-gradient(145deg, #fff5f5 0%, #ffe8e8 100%); }
+.strategy-card.s2 { --accent: #51cf66; --accent-light: #8ce99a; background: linear-gradient(145deg, #f8fff9 0%, #e8f8eb 100%); }
+.strategy-card.s1 { --accent: #339af0; --accent-light: #74c0fc; background: linear-gradient(145deg, #f4faff 0%, #e7f5ff 100%); }
+.strategy-card.all { --accent: #845ef7; --accent-light: #b197fc; background: linear-gradient(145deg, #f8f5ff 0%, #f3efff 100%); }
+.card-icon { font-size: 42px; margin-bottom: 12px; }
+.card-title { font-size: 15px; font-weight: 700; color: #212529; margin-bottom: 8px; }
+.card-count { font-size: 48px; font-weight: 800; color: var(--accent); line-height: 1; margin-bottom: 8px; text-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.card-desc { font-size: 12px; color: #868e96; line-height: 1.4; }
+.card-arrow { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-size: 20px; color: var(--accent); opacity: 0; transition: all 0.3s; }
+.strategy-card:hover .card-arrow { opacity: 1; }
+.footer { text-align: center; padding: 24px; color: #868e96; font-size: 12px; }
+@media (max-width: 1200px) { .strategy-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 768px) { .container { padding: 16px; } .hero { padding: 28px 16px 24px; border-radius: 16px; } .hero h1 { font-size: 24px; } .strategy-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; } .card-count { font-size: 36px; } .card-icon { font-size: 32px; } }
+@media (max-width: 480px) { .strategy-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<nav class="top-nav">
+  <a href="index.html" class="nav-brand">📊 A股工具箱</a>
+  <a href="index.html">🏠 首页</a>
+  <a href="市场复盘_20260428_v3.html">📈 每日复盘</a>
+  <a href="选股策略_三合一.html" class="active">🎯 选股策略</a>
+  <span class="nav-spacer"></span>
+  <span class="nav-date">更新时间：2026-04-28</span>
+</nav>
+
+<div class="container">
+  <div class="hero">
+    <h1><span class="emoji">🎯</span> 选股策略系统</h1>
+    <div class="subtitle">
+      <span>⭐ 三合一金股</span>
+      <span>📊 五大维度量化筛选</span>
+      <span>🔢 九宽数据</span>
+    </div>
+  </div>
+
+  <div class="strategy-grid">
+    <div class="strategy-card gold" onclick="location.href='选股策略_三合一_detail.html'">
+      <div class="card-icon">⭐</div>
+      <div class="card-title">三合一金股</div>
+      <div class="card-count">0</div>
+      <div class="card-desc">同时命中三大策略<br>最严苛的选股条件</div>
+      <div class="card-arrow">→</div>
+    </div>
+
+    <div class="strategy-card s3" onclick="location.href='选股策略_全速前进.html'">
+      <div class="card-icon">🚀</div>
+      <div class="card-title">全速前进</div>
+      <div class="card-count">120</div>
+      <div class="card-desc">扣非净利+营收双加速<br>业绩增速持续扩大</div>
+      <div class="card-arrow">→</div>
+    </div>
+
+    <div class="strategy-card s2" onclick="location.href='选股策略_盈利质量.html'">
+      <div class="card-icon">📈</div>
+      <div class="card-title">盈利质量</div>
+      <div class="card-count">7</div>
+      <div class="card-desc">ROE·毛利·净利三年升<br>全方位盈利提升</div>
+      <div class="card-arrow">→</div>
+    </div>
+
+    <div class="strategy-card s1" onclick="location.href='选股策略_持股增长.html'">
+      <div class="card-icon">💎</div>
+      <div class="card-title">持股增长</div>
+      <div class="card-count">140</div>
+      <div class="card-desc">前十大股东连续增持<br>机构资金持续流入</div>
+      <div class="card-arrow">→</div>
+    </div>
+
+    <div class="strategy-card all" onclick="location.href='选股策略_命中股票.html'">
+      <div class="card-icon">📋</div>
+      <div class="card-title">命中股票</div>
+      <div class="card-count">262</div>
+      <div class="card-desc">命中任一策略<br>覆盖所有优质标的</div>
+      <div class="card-arrow">→</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>数据来源：策略筛选结果_v2.xlsx | 更新时间：2026-04-28</p>
+    <p style="margin-top:4px">© 2026 A股工具箱 · 三合一金股选股系统</p>
+  </div>
+</div>
+</body>
+</html>
