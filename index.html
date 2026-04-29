@@ -94,7 +94,7 @@
           </div>
 
           <div class="form-actions">
-            <button type="button" class="btn btn-secondary" id="cancelBtn" style="display:none">取消</button>
+            <button type="button" class="btn btn-secondary hidden" id="cancelBtn">取消</button>
             <button type="submit" class="btn btn-primary" id="submitBtn">保存复盘</button>
           </div>
         </form>
@@ -129,7 +129,7 @@
   </div>
 
   <!-- 删除确认弹窗 -->
-  <div class="modal-overlay" id="deleteModal" style="display:none">
+  <div class="modal-overlay hidden" id="deleteModal">
     <div class="modal">
       <h3>确认删除</h3>
       <p>确定要删除这条复盘记录吗？此操作不可恢复。</p>
@@ -141,7 +141,7 @@
   </div>
 
   <!-- 详情弹窗 -->
-  <div class="modal-overlay" id="detailModal" style="display:none">
+  <div class="modal-overlay hidden" id="detailModal">
     <div class="modal modal-large">
       <div class="modal-header">
         <h3 id="detailDate"></h3>

@@ -68,10 +68,10 @@
   }
 
   function formatDate(dateStr) {
-    const [year, month, day] = dateStr.split('-');
-    const d = new Date(dateStr + 'T00:00:00');
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const d = new Date(year, month - 1, day);
     const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
-    return `${year}年${month}月${day}日 周${weekdays[d.getDay()]}`;
+    return `${year}年${String(month).padStart(2,'0')}月${String(day).padStart(2,'0')}日 周${weekdays[d.getDay()]}`;
   }
 
   function escapeHtml(str) {
@@ -117,9 +117,9 @@
     form.reset();
     setTodayDate();
     editingId = null;
-    formTitle.textContent   = '新建复盘';
-    submitBtn.textContent   = '保存复盘';
-    cancelBtn.style.display = 'none';
+    formTitle.textContent = '新建复盘';
+    submitBtn.textContent = '保存复盘';
+    cancelBtn.classList.add('hidden');
   }
 
   /* ---------- Toggle form collapse ---------- */
@@ -192,11 +192,11 @@
     });
 
     if (filtered.length === 0) {
-      emptyState.style.display = '';
+      emptyState.classList.remove('hidden');
       return;
     }
 
-    emptyState.style.display = 'none';
+    emptyState.classList.add('hidden');
 
     filtered.forEach(review => {
       const item = createReviewItem(review);
@@ -258,9 +258,9 @@
     editingId = id;
     populateForm(review);
 
-    formTitle.textContent   = '编辑复盘';
-    submitBtn.textContent   = '更新复盘';
-    cancelBtn.style.display = '';
+    formTitle.textContent = '编辑复盘';
+    submitBtn.textContent = '更新复盘';
+    cancelBtn.classList.remove('hidden');
 
     // Expand form if collapsed
     form.classList.remove('collapsed');
@@ -273,11 +273,11 @@
   /* ---------- Delete ---------- */
   function openDeleteModal(id) {
     deletingId = id;
-    deleteModal.style.display = 'flex';
+    deleteModal.classList.remove('hidden');
   }
 
   cancelDeleteBtn.addEventListener('click', () => {
-    deleteModal.style.display = 'none';
+    deleteModal.classList.add('hidden');
     deletingId = null;
   });
 
@@ -286,14 +286,14 @@
     reviews = reviews.filter(r => r.id !== deletingId);
     saveReviews();
     renderList();
-    deleteModal.style.display = 'none';
+    deleteModal.classList.add('hidden');
     deletingId = null;
     showToast('已删除', 'success');
   });
 
   deleteModal.addEventListener('click', (e) => {
     if (e.target === deleteModal) {
-      deleteModal.style.display = 'none';
+      deleteModal.classList.add('hidden');
       deletingId = null;
     }
   });
@@ -339,22 +339,22 @@
     `;
 
     editFromDetailBtn.dataset.id = id;
-    detailModal.style.display = 'flex';
+    detailModal.classList.remove('hidden');
   }
 
   [closeDetailBtn, closeDetailBtn2].forEach(btn => {
     btn.addEventListener('click', () => {
-      detailModal.style.display = 'none';
+      detailModal.classList.add('hidden');
     });
   });
 
   detailModal.addEventListener('click', (e) => {
-    if (e.target === detailModal) detailModal.style.display = 'none';
+    if (e.target === detailModal) detailModal.classList.add('hidden');
   });
 
   editFromDetailBtn.addEventListener('click', () => {
     const id = editFromDetailBtn.dataset.id;
-    detailModal.style.display = 'none';
+    detailModal.classList.add('hidden');
     startEdit(id);
   });
 

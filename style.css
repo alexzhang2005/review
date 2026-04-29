@@ -496,6 +496,11 @@ body {
   display: none;
 }
 
+/* ===== Utility ===== */
+.hidden {
+  display: none !important;
+}
+
 /* ===== Notification toast ===== */
 .toast {
   position: fixed;
