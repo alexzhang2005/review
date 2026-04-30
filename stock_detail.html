@@ -66,76 +66,110 @@ body {
   padding: 24px;
   margin-bottom: 24px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  border: 2px solid #ffd700;
 }
-.section-title { font-size: 16px; font-weight: 700; color: #212529; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-.section-title .icon { font-size: 20px; }
-.tracking-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-.tracking-stats { font-size: 12px; color: #868e96; }
-.tracking-upload-btn { background: linear-gradient(135deg, #ffd700, #ffed4e); color: #212529; border: none; padding: 8px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s; }
-.tracking-upload-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(255,215,0,0.3); }
-.upload-area { border: 2px dashed #dee2e6; border-radius: 12px; padding: 32px; text-align: center; cursor: pointer; transition: all 0.2s; }
-.upload-area:hover { border-color: #ffd700; background: rgba(255,215,0,0.05); }
-.upload-area .icon { font-size: 32px; margin-bottom: 8px; }
-.upload-area p { color: #868e96; font-size: 13px; }
-.upload-area span { color: #ffd700; font-weight: 600; }
-.tracking-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-top: 16px; }
-.tracking-item { background: #f8f9fa; border-radius: 8px; padding: 12px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; }
-.tracking-item:hover { border-color: #ffd700; background: #fff; }
-.tracking-item .thumb { width: 40px; height: 40px; border-radius: 6px; background: #e9ecef; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-.tracking-item .info { flex: 1; min-width: 0; }
-.tracking-item .name { font-size: 12px; font-weight: 600; color: #212529; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.tracking-item .date { font-size: 11px; color: #868e96; }
-.tracking-item .delete-btn { width: 24px; height: 24px; border-radius: 50%; background: #fff; border: 1px solid #dee2e6; color: #868e96; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-.tracking-item .delete-btn:hover { background: #ff6b6b; color: #fff; border-color: #ff6b6b; }
-.tracking-empty { text-align: center; padding: 24px; color: #adb5bd; font-size: 13px; }
-#file-input { display: none; }
+.section-title { font-size: 18px; font-weight: 700; color: #212529; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+.section-title .icon { font-size: 22px; }
+.section-title::before { content: ''; width: 5px; height: 22px; background: linear-gradient(180deg, #ffd700, #ffed4e); border-radius: 3px; }
 
-/* 详情模块卡片 */
-.detail-card {
+/* 文本跟踪区域 */
+.text-tracking { margin-bottom: 24px; }
+.text-tracking-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.text-tracking-label { font-size: 14px; font-weight: 600; color: #495057; display: flex; align-items: center; gap: 6px; }
+.text-tracking-label .icon { font-size: 16px; }
+.save-text-btn { background: linear-gradient(135deg, #51cf66, #8ce99a); color: #fff; border: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s; }
+.save-text-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(81,207,102,0.3); }
+.textarea-wrap { position: relative; }
+.tracking-textarea { width: 100%; min-height: 120px; padding: 16px; border: 2px solid #e9ecef; border-radius: 12px; font-size: 13px; line-height: 1.8; resize: vertical; transition: border-color 0.2s; font-family: inherit; }
+.tracking-textarea:focus { outline: none; border-color: #ffd700; }
+.tracking-textarea::placeholder { color: #adb5bd; }
+.text-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 11px; color: #868e96; }
+.text-meta .char-count {}
+
+/* 文件上传区域 */
+.file-tracking { margin-bottom: 16px; }
+.file-tracking-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.file-tracking-label { font-size: 14px; font-weight: 600; color: #495057; display: flex; align-items: center; gap: 6px; }
+.file-actions { display: flex; gap: 8px; }
+.file-upload-btn { background: linear-gradient(135deg, #ffd700, #ffed4e); color: #212529; border: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s; }
+.file-upload-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(255,215,0,0.3); }
+#file-input { display: none; }
+.upload-area { border: 2px dashed #dee2e6; border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 16px; }
+.upload-area:hover { border-color: #ffd700; background: rgba(255,215,0,0.05); }
+.upload-area .icon { font-size: 28px; margin-bottom: 8px; }
+.upload-area p { color: #868e96; font-size: 13px; margin: 4px 0; }
+.upload-area span { color: #ffd700; font-weight: 600; }
+
+/* 文件列表 */
+.tracking-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.tracking-item { background: #f8f9fa; border-radius: 10px; padding: 14px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; }
+.tracking-item:hover { border-color: #ffd700; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.tracking-item .thumb { width: 44px; height: 44px; border-radius: 8px; background: #e9ecef; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.tracking-item .info { flex: 1; min-width: 0; }
+.tracking-item .name { font-size: 12px; font-weight: 600; color: #212529; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+.tracking-item .date { font-size: 11px; color: #868e96; }
+.tracking-item .delete-btn { width: 26px; height: 26px; border-radius: 50%; background: #fff; border: 1px solid #dee2e6; color: #868e96; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
+.tracking-item .delete-btn:hover { background: #ff6b6b; color: #fff; border-color: #ff6b6b; }
+.tracking-empty { text-align: center; padding: 20px; color: #adb5bd; font-size: 13px; }
+
+/* 基本信息模块 */
+.basic-section {
   background: #fff;
   border-radius: 16px;
   padding: 24px;
   margin-bottom: 20px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.06);
 }
+.module-title { font-size: 18px; font-weight: 700; color: #212529; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+.module-title .icon { font-size: 22px; }
+.module-title::before { content: ''; width: 5px; height: 22px; background: linear-gradient(180deg, #339af0, #74c0fc); border-radius: 3px; }
 .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
-.info-item { padding: 12px; background: #f8f9fa; border-radius: 8px; }
-.info-label { font-size: 12px; color: #868e96; margin-bottom: 4px; }
-.info-value { font-size: 14px; font-weight: 600; color: #212529; }
-.info-value.highlight { color: #ffd700; font-size: 18px; }
-.info-value.red { color: #ff6b6b; }
-.info-value.green { color: #51cf66; }
-.section-subtitle { font-size: 15px; font-weight: 600; color: #212529; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-.section-subtitle::before { content: ''; width: 4px; height: 16px; background: linear-gradient(180deg, #ffd700, #ffed4e); border-radius: 2px; }
+.info-item { padding: 14px; background: #f8f9fa; border-radius: 10px; }
+.info-label { font-size: 12px; color: #868e96; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+.info-value { font-size: 15px; font-weight: 600; color: #212529; }
+.info-value.highlight { color: #ffd700; font-size: 20px; }
+.section-subtitle { font-size: 15px; font-weight: 600; color: #212529; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; padding-left: 8px; border-left: 3px solid #dee2e6; }
 .tag-cloud { display: flex; flex-wrap: wrap; gap: 6px; }
-.concept-tag { background: linear-gradient(135deg, rgba(132,94,247,0.1), rgba(132,94,247,0.05)); color: #845ef7; border: 1px solid rgba(132,94,247,0.2); padding: 4px 10px; border-radius: 6px; font-size: 12px; transition: all 0.2s; cursor: default; }
+.concept-tag { background: linear-gradient(135deg, rgba(132,94,247,0.1), rgba(132,94,247,0.05)); color: #845ef7; border: 1px solid rgba(132,94,247,0.2); padding: 5px 12px; border-radius: 6px; font-size: 12px; transition: all 0.2s; cursor: default; }
 .concept-tag:hover { background: #845ef7; color: #fff; }
-.content-box { background: #f8f9fa; border-radius: 8px; padding: 16px; font-size: 13px; color: #495057; line-height: 1.8; }
-.highlight-box { background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,237,78,0.05)); border: 1px solid rgba(255,215,0,0.2); border-radius: 8px; padding: 16px; }
-.warning-box { background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,107,107,0.05)); border: 1px solid rgba(255,107,107,0.2); border-radius: 8px; padding: 16px; display: flex; align-items: flex-start; gap: 12px; }
-.warning-box .icon { font-size: 20px; }
+.content-box { background: #f8f9fa; border-radius: 10px; padding: 16px; font-size: 13px; color: #495057; line-height: 1.8; }
+.content-scroll { max-height: 200px; overflow-y: auto; padding-right: 8px; }
+.content-scroll::-webkit-scrollbar { width: 6px; }
+.content-scroll::-webkit-scrollbar-thumb { background: #dee2e6; border-radius: 3px; }
+.highlight-box { background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,237,78,0.05)); border: 1px solid rgba(255,215,0,0.3); border-radius: 10px; padding: 16px; }
+.warning-box { background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,107,107,0.05)); border: 1px solid rgba(255,107,107,0.3); border-radius: 10px; padding: 16px; display: flex; align-items: flex-start; gap: 12px; }
+.warning-box .icon { font-size: 20px; flex-shrink: 0; }
 .warning-box .text { font-size: 13px; color: #c92a2a; line-height: 1.6; }
-.business-content { max-height: 200px; overflow-y: auto; }
-.business-content::-webkit-scrollbar { width: 6px; }
-.business-content::-webkit-scrollbar-thumb { background: #dee2e6; border-radius: 3px; }
-.back-btn { background: #fff; border: 1px solid #dee2e6; color: #495057; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 6px; transition: all 0.2s; }
+.back-btn { background: #fff; border: 1px solid #dee2e6; color: #495057; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; margin-bottom: 16px; }
 .back-btn:hover { border-color: #ffd700; color: #ffd700; }
 
-/* 模态框查看大图/文档 */
-.modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; padding: 24px; }
+/* 模态框 */
+.modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center; padding: 24px; }
 .modal.show { display: flex; }
 .modal-content { background: #fff; border-radius: 16px; max-width: 90vw; max-height: 90vh; overflow: auto; position: relative; }
-.modal-close { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border-radius: 50%; background: rgba(0,0,0,0.5); color: #fff; border: none; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.modal-close { position: absolute; top: 12px; right: 12px; width: 36px; height: 36px; border-radius: 50%; background: rgba(0,0,0,0.5); color: #fff; border: none; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; }
 .modal-close:hover { background: rgba(0,0,0,0.8); }
 .modal img { max-width: 100%; max-height: 85vh; display: block; border-radius: 12px; }
-.pdf-frame { width: 100%; height: 80vh; border: none; border-radius: 12px; }
+.pdf-frame { width: 800px; height: 80vh; border: none; border-radius: 12px; }
 .loading { text-align: center; padding: 48px; color: #868e96; }
+
+/* 文本查看模态框 */
+.text-viewer { padding: 24px; min-width: 400px; max-width: 700px; }
+.text-viewer-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #dee2e6; }
+.text-viewer-title { font-size: 16px; font-weight: 600; color: #212529; }
+.text-viewer-date { font-size: 12px; color: #868e96; }
+.text-viewer-content { background: #f8f9fa; border-radius: 10px; padding: 20px; max-height: 60vh; overflow-y: auto; font-size: 14px; line-height: 1.8; white-space: pre-wrap; word-break: break-all; }
+.text-viewer-content::-webkit-scrollbar { width: 6px; }
+.text-viewer-content::-webkit-scrollbar-thumb { background: #dee2e6; border-radius: 3px; }
 
 @media (max-width: 768px) {
   .container { padding: 16px; }
   .stock-header { padding: 24px 16px; border-radius: 16px; }
   .stock-title h1 { font-size: 24px; }
   .card-grid { grid-template-columns: 1fr 1fr; }
+  .tracking-list { grid-template-columns: 1fr; }
+  .pdf-frame { width: 95vw; height: 70vh; }
+  .text-viewer { min-width: 90vw; }
 }
 </style>
 </head>
@@ -150,9 +184,7 @@ body {
 
 <div class="container">
   <!-- 返回按钮 -->
-  <div style="margin-bottom: 16px;">
-    <button class="back-btn" onclick="history.back()">← 返回</button>
-  </div>
+  <button class="back-btn" onclick="history.back()">← 返回</button>
 
   <!-- 股票头部信息 -->
   <div class="stock-header">
@@ -163,35 +195,58 @@ body {
     <div class="stock-meta" id="stock-meta"></div>
   </div>
 
-  <!-- 跟踪信息模块 -->
+  <!-- ========== 跟踪信息模块 ========== -->
   <div class="tracking-section">
-    <div class="tracking-header">
-      <div class="section-title"><span class="icon">📎</span>跟踪信息</div>
-      <button class="tracking-upload-btn" onclick="document.getElementById('file-input').click()">
-        <span>＋</span> 添加文件
-      </button>
+    <div class="section-title"><span class="icon">📎</span>跟踪信息</div>
+    
+    <!-- 文本跟踪 -->
+    <div class="text-tracking">
+      <div class="text-tracking-header">
+        <div class="text-tracking-label"><span class="icon">📝</span> 文本笔记</div>
+        <button class="save-text-btn" onclick="saveText()">💾 保存笔记</button>
+      </div>
+      <div class="textarea-wrap">
+        <textarea class="tracking-textarea" id="tracking-text" placeholder="在此记录股票的跟踪笔记、研究结论、买入理由、风险关注点等...&#10;&#10;支持多行输入，保存后可在下方查看完整历史记录。"></textarea>
+      </div>
+      <div class="text-meta">
+        <span class="char-count" id="char-count">0 字符</span>
+        <span id="last-save-time"></span>
+      </div>
     </div>
-    <input type="file" id="file-input" accept=".pdf,.png,.jpg,.jpeg,.gif,.webp" multiple>
-    <div class="upload-area" onclick="document.getElementById('file-input').click()">
-      <div class="icon">📁</div>
-      <p>点击或拖拽文件到这里上传</p>
-      <p><span>PDF、图片</span> 格式均可</p>
-    </div>
-    <div class="tracking-list" id="tracking-list">
-      <div class="tracking-empty">暂无跟踪文件，点击上方区域上传</div>
+
+    <!-- 文件上传 -->
+    <div class="file-tracking">
+      <div class="file-tracking-header">
+        <div class="file-tracking-label"><span class="icon">📁</span> 附件文件</div>
+        <div class="file-actions">
+          <button class="file-upload-btn" onclick="document.getElementById('file-input').click()">
+            <span>＋</span> 添加文件
+          </button>
+        </div>
+      </div>
+      <input type="file" id="file-input" accept=".pdf,.png,.jpg,.jpeg,.gif,.webp" multiple>
+      <div class="upload-area" onclick="document.getElementById('file-input').click()">
+        <div class="icon">📤</div>
+        <p>点击或拖拽文件到此处上传</p>
+        <p><span>支持 PDF、图片格式</span></p>
+      </div>
+      <div class="tracking-list" id="tracking-list">
+        <div class="tracking-empty">暂无附件，点击上方区域上传</div>
+      </div>
     </div>
   </div>
 
-  <!-- 基本信息卡片 -->
-  <div class="detail-card">
-    <div class="section-subtitle">基本信息</div>
+  <!-- ========== 基本信息模块 ========== -->
+  <div class="basic-section">
+    <div class="module-title"><span class="icon">📊</span>基本信息</div>
+    
     <div class="card-grid">
       <div class="info-item">
-        <div class="info-label">行业PE</div>
+        <div class="info-label">行业 PE</div>
         <div class="info-value highlight" id="val-industry-pe">-</div>
       </div>
       <div class="info-item">
-        <div class="info-label">市盈率(TTM)</div>
+        <div class="info-label">市盈率 (TTM)</div>
         <div class="info-value" id="val-pe">-</div>
       </div>
       <div class="info-item">
@@ -206,31 +261,31 @@ body {
   </div>
 
   <!-- 概念主题 -->
-  <div class="detail-card">
+  <div class="basic-section">
     <div class="section-subtitle">概念和主题</div>
     <div class="tag-cloud" id="concept-tags"></div>
   </div>
 
   <!-- 主营构成 -->
-  <div class="detail-card">
+  <div class="basic-section">
     <div class="section-subtitle">主营构成</div>
-    <div class="content-box" id="val-business-type">-</div>
+    <div class="content-box content-scroll" id="val-business-type">-</div>
   </div>
 
   <!-- 主营业务 -->
-  <div class="detail-card">
+  <div class="basic-section">
     <div class="section-subtitle">主营业务</div>
-    <div class="content-box business-content" id="val-main-business">-</div>
+    <div class="content-box content-scroll" id="val-main-business">-</div>
   </div>
 
   <!-- 公司亮点 -->
-  <div class="detail-card">
+  <div class="basic-section">
     <div class="section-subtitle">公司亮点</div>
     <div class="highlight-box" id="val-highlight">-</div>
   </div>
 
   <!-- 风险提示 -->
-  <div class="detail-card">
+  <div class="basic-section">
     <div class="section-subtitle">风险提示</div>
     <div id="risk-container"></div>
   </div>
@@ -244,11 +299,25 @@ body {
   </div>
 </div>
 
+<!-- 文本查看器模态框 -->
+<div class="modal" id="text-modal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeTextModal()">×</button>
+    <div class="text-viewer">
+      <div class="text-viewer-header">
+        <span class="text-viewer-title">📝 笔记内容</span>
+        <span class="text-viewer-date" id="text-viewer-date"></span>
+      </div>
+      <div class="text-viewer-content" id="text-viewer-content"></div>
+    </div>
+  </div>
+</div>
+
 <script>
 // 股票数据
 let stockData = {};
-// 跟踪文件
-let trackingFiles = [];
+// 跟踪数据
+let trackingData = {};
 
 // 获取股票代码
 function getStockCode() {
@@ -282,8 +351,8 @@ function renderStockDetail() {
   document.getElementById('stock-name').textContent = info['名称'] || '-';
   document.getElementById('stock-code').textContent = code;
 
-  // 加载跟踪文件
-  loadTrackingFiles(code);
+  // 加载跟踪数据
+  loadTrackingData(code);
 
   // 基本信息
   setVal('val-industry-pe', info['行业PE'] || '-', 'highlight');
@@ -303,7 +372,8 @@ function renderStockDetail() {
   setVal('val-main-business', info['主营业务'] || '-');
 
   // 公司亮点
-  setVal('val-highlight', info['公司亮点'] || '-', '', true);
+  const highlight = info['公司亮点'] || '-';
+  document.getElementById('val-highlight').textContent = highlight;
 
   // 风险提示
   const risk = info['风险提示'] || '';
@@ -315,36 +385,81 @@ function renderStockDetail() {
   }
 }
 
-function setVal(id, val, extraClass = '', isHighlight = false) {
+function setVal(id, val, extraClass = '') {
   const el = document.getElementById(id);
   el.textContent = val || '-';
   if (extraClass) el.classList.add(extraClass);
-  if (isHighlight) el.style.cssText = 'font-size:14px;padding:12px;';
 }
 
-// 跟踪文件管理
+// ========== 跟踪数据管理 ==========
 function getTrackingKey(code) {
   return `tracking_${code}`;
 }
 
-function loadTrackingFiles(code) {
+function loadTrackingData(code) {
   const stored = localStorage.getItem(getTrackingKey(code));
-  trackingFiles = stored ? JSON.parse(stored) : [];
-  renderTrackingList();
+  trackingData = stored ? JSON.parse(stored) : { text: '', textDate: '', files: [] };
+  
+  // 渲染文本
+  document.getElementById('tracking-text').value = trackingData.text || '';
+  updateCharCount();
+  updateLastSaveTime();
+  
+  // 渲染文件
+  renderFileList();
 }
 
-function saveTrackingFiles() {
+function saveTrackingData() {
   const code = getStockCode();
-  localStorage.setItem(getTrackingKey(code), JSON.stringify(trackingFiles));
+  localStorage.setItem(getTrackingKey(code), JSON.stringify(trackingData));
 }
 
-function renderTrackingList() {
-  const list = document.getElementById('tracking-list');
-  if (trackingFiles.length === 0) {
-    list.innerHTML = '<div class="tracking-empty">暂无跟踪文件，点击上方区域上传</div>';
+// 文本跟踪
+function saveText() {
+  const text = document.getElementById('tracking-text').value;
+  trackingData.text = text;
+  trackingData.textDate = new Date().toLocaleString('zh-CN');
+  saveTrackingData();
+  updateLastSaveTime();
+  alert('笔记已保存！');
+}
+
+function updateCharCount() {
+  const text = document.getElementById('tracking-text').value;
+  document.getElementById('char-count').textContent = `${text.length} 字符`;
+}
+
+function updateLastSaveTime() {
+  const el = document.getElementById('last-save-time');
+  if (trackingData.textDate) {
+    el.textContent = `最后保存: ${trackingData.textDate}`;
+  } else {
+    el.textContent = '';
+  }
+}
+
+function viewText() {
+  if (!trackingData.text) {
+    alert('暂无笔记内容');
     return;
   }
-  list.innerHTML = trackingFiles.map((f, i) => `
+  document.getElementById('text-viewer-date').textContent = trackingData.textDate || '';
+  document.getElementById('text-viewer-content').textContent = trackingData.text;
+  document.getElementById('text-modal').classList.add('show');
+}
+
+function closeTextModal() {
+  document.getElementById('text-modal').classList.remove('show');
+}
+
+// 文件管理
+function renderFileList() {
+  const list = document.getElementById('tracking-list');
+  if (!trackingData.files || trackingData.files.length === 0) {
+    list.innerHTML = '<div class="tracking-empty">暂无附件，点击上方区域上传</div>';
+    return;
+  }
+  list.innerHTML = trackingData.files.map((f, i) => `
     <div class="tracking-item" onclick="previewFile(${i})">
       <div class="thumb">${getFileIcon(f.type)}</div>
       <div class="info">
@@ -363,43 +478,12 @@ function getFileIcon(type) {
 }
 
 function deleteFile(index) {
-  trackingFiles.splice(index, 1);
-  saveTrackingFiles();
-  renderTrackingList();
-}
-
-function previewFile(index) {
-  const file = trackingFiles[index];
-  const modal = document.getElementById('preview-modal');
-  const content = document.getElementById('modal-content');
-  const loading = document.getElementById('modal-loading');
-  
-  modal.classList.add('show');
-  
-  if (file.type.includes('image')) {
-    loading.style.display = 'none';
-    content.innerHTML = `
-      <button class="modal-close" onclick="closeModal()">×</button>
-      <img src="${file.data}" alt="${file.name}">
-    `;
-  } else if (file.type.includes('pdf')) {
-    loading.style.display = 'block';
-    content.innerHTML = `
-      <button class="modal-close" onclick="closeModal()">×</button>
-      <div class="loading" id="modal-loading">加载中...</div>
-      <iframe class="pdf-frame" src="${file.data}"></iframe>
-    `;
+  if (confirm('确定要删除这个文件吗？')) {
+    trackingData.files.splice(index, 1);
+    saveTrackingData();
+    renderFileList();
   }
 }
-
-function closeModal() {
-  document.getElementById('preview-modal').classList.remove('show');
-}
-
-// 文件上传处理
-document.getElementById('file-input').addEventListener('change', function(e) {
-  handleFiles(e.target.files);
-});
 
 function handleFiles(files) {
   Array.from(files).forEach(file => {
@@ -411,13 +495,52 @@ function handleFiles(files) {
         data: e.target.result,
         date: new Date().toLocaleDateString()
       };
-      trackingFiles.push(fileData);
-      saveTrackingFiles();
-      renderTrackingList();
+      if (!trackingData.files) trackingData.files = [];
+      trackingData.files.push(fileData);
+      saveTrackingData();
+      renderFileList();
     };
     reader.readAsDataURL(file);
   });
 }
+
+function previewFile(index) {
+  const file = trackingData.files[index];
+  const modal = document.getElementById('preview-modal');
+  const content = document.getElementById('modal-content');
+  
+  modal.classList.add('show');
+  
+  if (file.type.includes('image')) {
+    content.innerHTML = `
+      <button class="modal-close" onclick="closeModal()">×</button>
+      <img src="${file.data}" alt="${file.name}">
+    `;
+  } else if (file.type.includes('pdf')) {
+    content.innerHTML = `
+      <button class="modal-close" onclick="closeModal()">×</button>
+      <iframe class="pdf-frame" src="${file.data}"></iframe>
+    `;
+  } else {
+    content.innerHTML = `
+      <button class="modal-close" onclick="closeModal()">×</button>
+      <div class="loading">无法预览此文件类型: ${file.name}</div>
+    `;
+  }
+}
+
+function closeModal() {
+  document.getElementById('preview-modal').classList.remove('show');
+}
+
+// 文件上传事件
+document.getElementById('file-input').addEventListener('change', function(e) {
+  handleFiles(e.target.files);
+  e.target.value = ''; // 允许重复上传同一文件
+});
+
+// 文本输入监听
+document.getElementById('tracking-text').addEventListener('input', updateCharCount);
 
 // 拖拽上传
 const uploadArea = document.querySelector('.upload-area');
