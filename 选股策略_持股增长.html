@@ -483,23 +483,30 @@ function renderSectorView() {
 }
 
 let currentSector = 'all';
+let currentSectorStocks = [];
 function selectSector(ind1, el) {
     currentSector = decodeURIComponent(ind1);
     document.querySelectorAll('.sector-item').forEach(e => e.classList.remove('active'));
     el.classList.add('active');
     document.getElementById('current-sector-name').textContent = currentSector;
-    const stocks = s1List.filter(s => s.ind1 === currentSector);
-    renderSectorStocks(stocks);
+    currentSectorStocks = s1List.filter(s => s.ind1 === currentSector);
+    renderSectorStocks(currentSectorStocks);
 }
 
-function renderSectorStocks(stocks) {
+function renderSectorStocks(list) {
+    currentSectorStocks = list;
     let html = `<thead><tr>
-        <th>代码</th><th>名称</th><th>命中</th>
-        <th>增长期数</th>
-        <th>26Q1</th><th>25Q4</th><th>25Q3</th><th>25Q2</th>
+        <th class="sortable" data-sort-key="code" onclick="toggleSectorSort('code', s=>s.code)">代码</th>
+        <th>名称</th>
+        <th>命中</th>
+        <th class="sortable" data-sort-key="trail" onclick="toggleSectorSort('trail', s=>s.trail_count||0)">增长期数</th>
+        <th class="sortable" data-sort-key="sd_g0" onclick="toggleSectorSort('sd_g0', s=>s.sd_g[0]??-999)">26Q1增速</th>
+        <th>25Q4</th>
+        <th>25Q3</th>
+        <th>25Q2</th>
     </tr></thead><tbody>`;
     
-    stocks.forEach(s => {
+    list.forEach(s => {
         const trailNum = s.trail_count || 0;
         const trailStyle = trailNum >= 3 ? 'color:#ff6b6b;font-weight:bold' : (trailNum >= 1 ? 'color:#868e96' : '');
         html += `<tr>
@@ -515,7 +522,31 @@ function renderSectorStocks(stocks) {
     });
     html += '</tbody>';
     document.getElementById('sector-table').innerHTML = html;
-    document.getElementById('sector-stock-count').textContent = stocks.length + ' 只';
+    document.getElementById('sector-stock-count').textContent = list.length + ' 只';
+}
+
+// 板块表格排序
+const sectorSortState = {};
+function toggleSectorSort(key, getValue) {
+    if (!sectorSortState[key]) {
+        sectorSortState[key] = { asc: false };
+    } else {
+        sectorSortState[key].asc = !sectorSortState[key].asc;
+    }
+    const sorted = [...currentSectorStocks].sort((a, b) => {
+        const va = getValue(a);
+        const vb = getValue(b);
+        if (va == null && vb == null) return 0;
+        if (va == null) return sectorSortState[key].asc ? 1 : -1;
+        if (vb == null) return sectorSortState[key].asc ? -1 : 1;
+        return sectorSortState[key].asc ? va - vb : vb - va;
+    });
+    document.querySelectorAll('#sector-table .sortable').forEach(th => {
+        const k = th.dataset.sortKey;
+        if (k === key) th.classList.add('active');
+        else th.classList.remove('active');
+    });
+    renderSectorStocks(sorted);
 }
 
 
