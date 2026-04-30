@@ -436,7 +436,7 @@ function renderStockList(list, pg) {
         <th>扣非22</th>
     </tr></thead><tbody>`;
     
-    s3List.slice(p.start, p.end).forEach(s => {
+    list.slice(p.start, p.end).forEach(s => {
         html += `<tr>
             <td>${stockLink(s.code)}</td>
             <td class="stock-name" onclick="showDetail('${s.code}')">${s.name}${s.all?' ⭐':''}</td>
