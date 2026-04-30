@@ -496,17 +496,23 @@ function selectSector(ind1, el) {
     document.getElementById('current-sector-name').textContent = currentSector;
     
     // 重新获取该板块的股票
-    const stocks = DATA.filter(s => s.ind1 === currentSector && s.all);
-    renderSectorStocks(stocks);
+    currentSectorStocks = DATA.filter(s => s.ind1 === currentSector && s.all);
+    renderSectorStocks(currentSectorStocks);
 }
 
-function renderSectorStocks(stocks) {
+let currentSectorStocks = [];
+function renderSectorStocks(list) {
+    currentSectorStocks = list;
     let html = `<thead><tr>
-        <th>代码</th><th>名称</th><th>全速前进</th><th>盈利质量</th><th>持股增长</th>
-        <th>25ROE</th><th>25毛利</th><th>25扣非</th>
+        <th class="sortable" data-sort-key="code" onclick="toggleSectorSort('code', s=>s.code)">代码</th>
+        <th>名称</th>
+        <th>全速前进</th><th>盈利质量</th><th>持股增长</th>
+        <th class="sortable" data-sort-key="roe_g0" onclick="toggleSectorSort('roe_g0', s=>s.roe_g[0]??-999)">ROE25增速</th>
+        <th class="sortable" data-sort-key="ml_g0" onclick="toggleSectorSort('ml_g0', s=>s.ml_g[0]??-999)">毛利25增速</th>
+        <th class="sortable" data-sort-key="kf_g0" onclick="toggleSectorSort('kf_g0', s=>s.kf_g[0]??-999)">扣非25增速</th>
     </tr></thead><tbody>`;
     
-    stocks.forEach(s => {
+    list.forEach(s => {
         html += `<tr>
             <td>${stockLink(s.code)}</td>
             <td class="stock-name" onclick="showDetail('${s.code}')">${s.name} ⭐</td>
@@ -520,7 +526,31 @@ function renderSectorStocks(stocks) {
     });
     html += '</tbody>';
     document.getElementById('sector-table').innerHTML = html;
-    document.getElementById('sector-stock-count').textContent = stocks.length + ' 只';
+    document.getElementById('sector-stock-count').textContent = list.length + ' 只';
+}
+
+// 板块表格排序
+const sectorSortState = {};
+function toggleSectorSort(key, getValue) {
+    if (!sectorSortState[key]) {
+        sectorSortState[key] = { asc: false };
+    } else {
+        sectorSortState[key].asc = !sectorSortState[key].asc;
+    }
+    const sorted = [...currentSectorStocks].sort((a, b) => {
+        const va = getValue(a);
+        const vb = getValue(b);
+        if (va == null && vb == null) return 0;
+        if (va == null) return sectorSortState[key].asc ? 1 : -1;
+        if (vb == null) return sectorSortState[key].asc ? -1 : 1;
+        return sectorSortState[key].asc ? va - vb : vb - va;
+    });
+    document.querySelectorAll('#sector-table .sortable').forEach(th => {
+        const k = th.dataset.sortKey;
+        if (k === key) th.classList.add('active');
+        else th.classList.remove('active');
+    });
+    renderSectorStocks(sorted);
 }
 
 
