@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A股市场工具箱</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: #0a1628;
+  color: #e8edf5;
+  min-height: 100vh;
+}
+
+/* 顶部导航 */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(10, 22, 40, 0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  height: 56px;
+}
+.nav-brand {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffd700;
+  text-decoration: none;
+  letter-spacing: 0.5px;
+  margin-right: 32px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.nav-links {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+.nav-link {
+  padding: 6px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #8899aa;
+  font-size: 14px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.nav-link:hover { color: #e8edf5; background: rgba(255,255,255,0.06); }
+.nav-link.active { color: #ffd700; background: rgba(255,215,0,0.1); font-weight: 600; }
+.nav-link .badge {
+  background: #ff4757;
+  color: #fff;
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-weight: 700;
+}
+.nav-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.nav-date {
+  font-size: 12px;
+  color: #556677;
+}
+
+/* 主容器 */
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+/* Hero区 */
+.hero {
+  text-align: center;
+  margin-bottom: 48px;
+}
+.hero h1 {
+  font-size: 42px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ffd700 0%, #ff6b35 50%, #ffd700 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 12px;
+  letter-spacing: -0.5px;
+}
+.hero p {
+  color: #556677;
+  font-size: 15px;
+}
+
+/* 快捷入口 */
+.quick-links {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 48px;
+}
+.quick-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 28px;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+.quick-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+.quick-card.strategy::before { background: linear-gradient(90deg, #ffd700, #ff6b35); }
+.quick-card.review::before { background: linear-gradient(90deg, #4fc3f7, #29b6f6); }
+.quick-card:hover {
+  border-color: rgba(255,255,255,0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+.quick-card .qc-icon { font-size: 36px; margin-bottom: 12px; }
+.quick-card .qc-title { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+.quick-card .qc-desc { font-size: 13px; color: #556677; line-height: 1.5; }
+.quick-card .qc-arrow {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  font-size: 20px;
+  opacity: 0.3;
+}
+
+/* 区块标题 */
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #e8edf5;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.section-title .st-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: #ffd700;
+}
+
+/* 最新复盘 */
+.latest-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255,71,87,0.15);
+  border: 1px solid rgba(255,71,87,0.3);
+  color: #ff6b81;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+.review-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 40px;
+}
+.review-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s;
+}
+.review-card:hover {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.12);
+}
+.review-card.latest {
+  border-color: rgba(255,71,87,0.25);
+  background: rgba(255,71,87,0.04);
+}
+.review-info { display: flex; flex-direction: column; gap: 2px; }
+.review-date { font-size: 14px; font-weight: 600; color: #e8edf5; }
+.review-meta { font-size: 12px; color: #556677; }
+.review-arrow { font-size: 18px; color: #334; transition: all 0.2s; }
+.review-card:hover .review-arrow { color: #ffd700; transform: translateX(4px); }
+
+/* 策略卡片 */
+.strategy-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.ss-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+.ss-card a {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: all 0.2s;
+}
+.ss-card a:hover { background: rgba(255,255,255,0.04); border-radius: 10px; }
+.ss-val { font-size: 28px; font-weight: 800; color: #ffd700; line-height: 1; }
+.ss-val.blue { color: #4fc3f7; }
+.ss-val.green { color: #66bb6a; }
+.ss-val.orange { color: #ffa726; }
+.ss-lbl { font-size: 11px; color: #556677; margin-top: 6px; }
+.strategy-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255,215,0,0.06);
+  border: 1px solid rgba(255,215,0,0.15);
+  border-radius: 12px;
+  padding: 16px 20px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s;
+}
+.strategy-cta:hover { border-color: rgba(255,215,0,0.3); background: rgba(255,215,0,0.08); }
+.strategy-cta .sc-left { display: flex; align-items: center; gap: 10px; }
+.strategy-cta .sc-icon { font-size: 24px; }
+.strategy-cta .sc-title { font-size: 15px; font-weight: 600; color: #ffd700; }
+.strategy-cta .sc-sub { font-size: 12px; color: #556677; }
+.strategy-cta .sc-arrow { font-size: 20px; color: #ffd700; }
+
+/* 页脚 */
+.footer {
+  text-align: center;
+  padding: 32px 0;
+  color: #334;
+  font-size: 12px;
+  border-top: 1px solid rgba(255,255,255,0.04);
+  margin-top: 48px;
+}
+
+@media (max-width: 640px) {
+  .quick-links { grid-template-columns: 1fr; }
+  .strategy-stats { grid-template-columns: repeat(2, 1fr); }
+  .hero h1 { font-size: 28px; }
+}
+</style>
+</head>
+<body>
+
+<!-- 导航栏 -->
+<nav class="nav">
+  <a href="index.html" class="nav-brand">📊 A股工具箱</a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link active">🏠 首页</a>
+    <a href="市场复盘_20260429_v3.html" class="nav-link">📈 每日复盘 <span class="badge">最新</span></a>
+    <a href="选股策略_三合一.html" class="nav-link">🎯 选股策略</a>
+  </div>
+  <div class="nav-right">
+    <span class="nav-date">数据更新：2026-04-29</span>
+  </div>
+</nav>
+
+<!-- 主内容 -->
+<div class="container">
+
+  <!-- Hero -->
+  <div class="hero">
+    <h1>A股市场工具箱</h1>
+    <p>每日复盘 · 三合一选股策略 · 板块共振分析</p>
+  </div>
+
+  <!-- 快捷入口 -->
+  <div class="quick-links">
+    <a href="选股策略_三合一.html" class="quick-card strategy">
+      <div class="qc-icon">🎯</div>
+      <div class="qc-title">三合一选股策略</div>
+      <div class="qc-desc">三合一金股 · 全速前进 · 盈利质量<br>持股增长 · 全部命中</div>
+      <div class="qc-arrow">→</div>
+    </a>
+    <a href="市场复盘_20260429_v3.html" class="quick-card review">
+      <div class="qc-icon">📈</div>
+      <div class="qc-title">每日市场复盘</div>
+      <div class="qc-desc">大盘指数 · 市场情绪 · 涨跌停<br>板块轮动 · 自选股动态追踪</div>
+      <div class="qc-arrow">→</div>
+    </a>
+  </div>
+
+  <!-- 选股策略摘要 -->
+  <div class="section-title"><span class="st-dot"></span>选股策略数据</div>
+  <div class="strategy-stats">
+    <div class="ss-card">
+      <a href="策略_全部.html">
+        <div class="ss-val">620</div>
+        <div class="ss-lbl">全部符合条件</div>
+      </a>
+    </div>
+    <div class="ss-card">
+      <a href="策略_全速前进.html">
+        <div class="ss-val orange">49</div>
+        <div class="ss-lbl">全速前进</div>
+      </a>
+    </div>
+    <div class="ss-card">
+      <a href="策略_持股增长.html">
+        <div class="ss-val blue">201</div>
+        <div class="ss-lbl">持股增长</div>
+      </a>
+    </div>
+    <div class="ss-card">
+      <a href="策略_盈利质量.html">
+        <div class="ss-val green">402</div>
+        <div class="ss-lbl">盈利质量增长</div>
+      </a>
+    </div>
+  </div>
+    <a href="选股策略_三合一.html" class="strategy-cta">
+      <div class="sc-left">
+        <span class="sc-icon">⭐</span>
+        <div>
+          <div class="sc-title">选股策略系统</div>
+        <div class="sc-sub">三合一金股 · 五大策略入口</div>
+      </div>
+    </div>
+    <span class="sc-arrow">→</span>
+  </a>
+
+  <!-- 历史复盘 -->
+  <div class="section-title" style="margin-top:40px;">
+    <span class="st-dot" style="background:#4fc3f7;"></span>
+    历史复盘
+  </div>
+  <div class="review-list">
+    <a href="市场复盘_20260429_v3.html" class="review-card latest">
+      <div class="review-info">
+        <div><span class="latest-badge">🔥 今日</span> 2026年04月29日 (周三)</div>
+        <div class="review-meta">深强沪弱 · 创业板领涨+2.52% · 新能源锂电爆发</div>
+      </div>
+      <span class="review-arrow">→</span>
+    </a>
+    <a href="市场复盘_20260424.html" class="review-card">
+      <div class="review-info">
+        <div class="review-date">2026年04月24日 (周五)</div>
+        <div class="review-meta">大盘指数 · 情绪分析 · 涨跌停 · 板块 · 自选股</div>
+      </div>
+      <span class="review-arrow">→</span>
+    </a>
+    <a href="市场复盘_20260417.html" class="review-card">
+      <div class="review-info">
+        <div class="review-date">2026年04月17日 (周五)</div>
+        <div class="review-meta">大盘指数 · 情绪分析 · 涨跌停 · 板块 · 自选股</div>
+      </div>
+      <span class="review-arrow">→</span>
+    </a>
+    <a href="市场复盘_20260416.html" class="review-card">
+      <div class="review-info">
+        <div class="review-date">2026年04月16日 (周四)</div>
+        <div class="review-meta">大盘指数 · 情绪分析 · 涨跌停 · 板块 · 自选股</div>
+      </div>
+      <span class="review-arrow">→</span>
+    </a>
+    <a href="市场复盘_20260410.html" class="review-card">
+      <div class="review-info">
+        <div class="review-date">2026年04月10日 (周五)</div>
+        <div class="review-meta">大盘指数 · 情绪分析 · 涨跌停 · 板块 · 自选股</div>
+      </div>
+      <span class="review-arrow">→</span>
+    </a>
+  </div>
+
+  <div class="footer">
+    数据来源：九宽API · 策略数据来源：全部A股_含详细信息.xlsx<br>
+    本站点仅供个人投资辅助参考，不构成投资建议
+  </div>
+</div>
+
+</body>
+</html>
