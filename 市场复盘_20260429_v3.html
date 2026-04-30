@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>市场复盘 2026年4月29日</title>
+<style>
+:root{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#1c2128;
+  --gold:#ffd700;--red:#ff6b6b;--green:#51cf66;--blue:#4dabf7;--purple:#cc5de8;
+  --text:#e6edf3;--sub:#8b949e;--border:rgba(255,255,255,0.1)
+}
+*{box-sizing:border-box}
+body{font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.7;margin:0;padding:20px}
+.site-nav{background:rgba(13,17,23,.95);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;height:48px;border-radius:12px;margin-bottom:20px}
+.site-nav a{color:var(--sub);text-decoration:none;font-size:13px;padding:4px 10px;border-radius:6px}
+.site-nav a:hover{color:var(--text);background:rgba(255,255,255,.06)}
+.site-nav a.active{color:var(--gold);background:rgba(240,180,41,.1)}
+.nav-brand{font-weight:700;color:var(--gold)!important;margin-right:20px}
+.nav-sep{flex:1}
+
+.hero{text-align:center;padding:24px;background:linear-gradient(135deg,rgba(255,215,0,.1),rgba(255,215,0,.02));border:1px solid rgba(255,215,0,.2);border-radius:16px;margin-bottom:24px}
+.hero h1{font-size:22px;font-weight:700;color:var(--gold);margin:0 0 8px}
+.hero .date{color:var(--sub);font-size:13px}
+.hero .status{margin-top:12px;padding:10px 20px;background:rgba(255,255,255,.05);border-radius:8px;font-size:14px}
+
+.section{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:20px}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.section-icon{font-size:24px}
+.section-title{font-size:16px;font-weight:700;color:var(--gold);margin:0}
+.section-num{display:inline-block;width:28px;height:28px;line-height:28px;text-align:center;background:rgba(255,215,0,.2);color:var(--gold);border-radius:50%;font-size:13px;font-weight:700}
+
+.idx-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.idx-card{text-align:center;padding:16px 12px;background:var(--bg3);border-radius:12px;border:1px solid var(--border);transition:all .2s}
+.idx-card:hover{border-color:var(--gold);transform:translateY(-2px)}
+.idx-card.up{border-color:rgba(255,107,107,.4);background:rgba(255,107,107,.05)}
+.idx-card.down{border-color:rgba(81,207,102,.4);background:rgba(81,207,102,.05)}
+.idx-card.highlight{border-color:var(--gold);background:rgba(255,215,0,.1)}
+.idx-name{font-size:12px;color:var(--sub);margin-bottom:6px}
+.idx-pct{font-size:22px;font-weight:800}
+.idx-card.up .idx-pct{color:var(--red)}
+.idx-card.down .idx-pct{color:var(--green)}
+.idx-card.highlight .idx-pct{color:var(--gold)}
+
+.emotion-row{display:grid;grid-template-columns:120px 1fr;gap:24px;align-items:center;margin-bottom:20px}
+.emotion-score{text-align:center;padding:20px;background:var(--bg3);border-radius:12px}
+.score-num{font-size:48px;font-weight:900;color:var(--gold);line-height:1}
+.score-label{font-size:12px;color:var(--sub);margin-top:4px}
+.score-change{font-size:13px;color:var(--green);margin-top:8px}
+.emotion-bars{flex:1}
+.bar-item{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.bar-label{min-width:80px;font-size:12px;color:var(--sub)}
+.bar-track{flex:1;height:10px;background:rgba(255,255,255,.1);border-radius:5px;overflow:hidden}
+.bar-fill{height:100%;border-radius:5px}
+.bar-value{min-width:50px;text-align:right;font-weight:600}
+
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat-card{text-align:center;padding:16px;background:var(--bg3);border-radius:12px;border:1px solid var(--border)}
+.stat-val{font-size:28px;font-weight:800}
+.stat-val.up{color:var(--red)}
+.stat-val.down{color:var(--green)}
+.stat-label{font-size:11px;color:var(--sub);margin-top:4px}
+
+.highlight-box{padding:16px;background:rgba(77,171,247,.1);border:1px solid rgba(77,171,247,.3);border-radius:12px;margin-bottom:16px}
+.highlight-box h4{color:var(--blue);margin:0 0 8px;font-size:14px}
+.highlight-box p{margin:0;font-size:13px;line-height:1.7}
+
+.warning-box{padding:16px;background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.25);border-radius:12px;margin-bottom:16px}
+.warning-box h4{color:var(--red);margin:0 0 8px;font-size:14px}
+.warning-box p{margin:0;font-size:13px;line-height:1.7}
+
+.success-box{padding:16px;background:rgba(81,207,102,.08);border:1px solid rgba(81,207,102,.25);border-radius:12px;margin-bottom:16px}
+.success-box h4{color:var(--green);margin:0 0 8px;font-size:14px}
+.success-box p{margin:0;font-size:13px;line-height:1.7}
+
+.compare-block{padding:16px;background:var(--bg3);border-radius:12px;margin-bottom:12px}
+.compare-block h4{color:var(--sub);margin:0 0 8px;font-size:13px;font-weight:600}
+.compare-block p{margin:0;font-size:13px}
+
+.sec-list{display:flex;flex-direction:column;gap:8px}
+.sec-item{display:flex;align-items:center;padding:12px 16px;background:var(--bg3);border-radius:10px;transition:all .2s}
+.sec-item:hover{background:rgba(255,255,255,.06)}
+.sec-rank{width:26px;height:26px;line-height:26px;text-align:center;background:rgba(255,215,0,.2);color:var(--gold);border-radius:50%;font-size:12px;font-weight:700;margin-right:12px;flex-shrink:0}
+.sec-name{flex:1;font-size:14px}
+.sec-pct{font-size:18px;font-weight:700;color:var(--red);margin-left:auto}
+.sec-rps{font-size:11px;color:var(--sub);margin-left:8px;padding:2px 8px;background:rgba(255,255,255,.05);border-radius:4px}
+
+.tag-list{display:flex;flex-wrap:wrap;gap:8px}
+.tag{background:rgba(255,107,107,.12);border:1px solid rgba(255,107,107,.25);color:#ff8888;font-size:12px;padding:6px 12px;border-radius:6px}
+.tag.green{background:rgba(81,207,102,.12);border-color:rgba(81,207,102,.25);color:#88ffaa}
+.tag.blue{background:rgba(77,171,247,.12);border-color:rgba(77,171,247,.25);color:#74c0fc}
+.tag.gold{background:rgba(255,215,0,.12);border-color:rgba(255,215,0,.25);color:var(--gold)}
+
+.breadcrumb{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--sub);margin-bottom:16px}
+.breadcrumb span{padding:4px 12px;background:rgba(255,255,255,.05);border-radius:4px}
+.breadcrumb span.active{background:rgba(255,215,0,.2);color:var(--gold)}
+
+.footer{text-align:center;padding:32px 0;color:var(--sub);font-size:12px;border-top:1px solid var(--border);margin-top:32px}
+
+@media(max-width:768px){
+.idx-grid{grid-template-columns:repeat(2,1fr)}
+.emotion-row{grid-template-columns:1fr}
+.stats-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style></head>
+<body>
+
+<nav class="site-nav">
+  <a href="index.html" class="nav-brand">📊 A股工具箱</a>
+  <a href="index.html">🏠 首页</a>
+  <a href="#" class="active">📈 每日复盘</a>
+  <a href="选股策略_三合一.html">🎯 选股策略</a>
+  <span class="nav-sep"></span>
+  <span style="font-size:12px;color:var(--sub)">2026年4月29日 · 周三</span>
+</nav>
+
+<!-- 顶部标题区 -->
+<div class="hero">
+  <h1>📈 市场复盘 2026年4月29日</h1>
+  <div class="date">周三 · 收盘数据</div>
+  <div class="status">
+    <strong>市场状态：</strong>放量大涨，深强沪弱，创业板领涨，新能源锂电板块全线爆发
+  </div>
+</div>
+
+<!-- 一、大盘综述 -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">一</span>
+    <h2 class="section-title">大盘综述</h2>
+  </div>
+
+  <div class="idx-grid">
+    <div class="idx-card up">
+      <div class="idx-name">上证指数</div>
+      <div class="idx-pct">+0.71%</div>
+    </div>
+    <div class="idx-card up">
+      <div class="idx-name">深证成指</div>
+      <div class="idx-pct">+1.96%</div>
+    </div>
+    <div class="idx-card up">
+      <div class="idx-name">创业板指</div>
+      <div class="idx-pct">+2.52%</div>
+    </div>
+    <div class="idx-card highlight">
+      <div class="idx-name">科创50</div>
+      <div class="idx-pct">+0.33%</div>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-val up">72.94</div>
+      <div class="stat-label">上涨比例 %</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val up">102</div>
+      <div class="stat-label">涨停家数</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val down">23</div>
+      <div class="stat-label">跌停家数</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" style="color:var(--gold)">25732</div>
+      <div class="stat-label">成交额(亿)</div>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    <h4>🌡️ 市场情绪解读</h4>
+    <p>市场呈现<strong style="color:var(--red);">"深强沪弱、成长领涨"</strong>格局。上涨比例达<strong>72.94%</strong>，涨停102只、跌停仅23只，赚钱效应大幅扩散。创业板指<strong>+2.52%</strong>领涨主要指数，深成指<strong>+1.96%</strong>，沪指<strong>+0.71%</strong>，科创50表现相对滞后<strong>+0.33%</strong>。</p>
+  </div>
+
+  <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
+    <div class="stat-card">
+      <div class="stat-val" style="color:var(--gold)">+21.1</div>
+      <div class="stat-label">250日新高新低差值</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" style="color:var(--red)">+21.1</div>
+      <div class="stat-label">5日差值</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">57.67%</div>
+      <div class="stat-label">站上5日均线</div>
+    </div>
+  </div>
+
+  <p style="font-size:13px;color:var(--sub);margin:0;">📌 250日新高新低差值<strong>+21.1</strong>，较前日14.46继续扩张，长期趋势线持续向好。5日差值<strong>+21.1</strong>维持高位，市场广度良好。站上5日均线比例57.67%，短期均线系统呈多头排列态势。</p>
+</div>
+
+<!-- 一附加、与前日对比 -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">一+</span>
+    <h2 class="section-title">与前日对比</h2>
+  </div>
+
+  <div class="compare-block">
+    <h4>📋 前日预判回顾（4月28日）</h4>
+    <p>前日判断市场进入"修复反弹+结构分化"阶段，预计科技主线（半导体）延续强势。今日验证：市场确实延续反弹，但主线从<strong style="color:var(--gold);">半导体切换至新能源锂电</strong>，热点出现明显轮动。</p>
+  </div>
+
+  <div class="success-box">
+    <h4>✅ 预判验证</h4>
+    <p><strong>部分正确/出现热点切换。</strong>前日对"反弹延续、结构分化"的判断得到验证，但科技内部出现高低切换：锂电/电池化学品/能源金属涨幅居前（6-8%），而前日强势的半导体产品+0.02%表现平淡，说明资金从高位科技向低位新能源转移。</p>
+  </div>
+
+  <div class="compare-block">
+    <h4>🔄 趋势连续性</h4>
+    <p>从4月27-28日的"情绪修复、科技领涨"，在4月29日出现<strong style="color:var(--gold);">"新能源锂电全线爆发"</strong>的强势热点切换。250日差值+21.1与5日差值+21.1均维持高位，市场中期向上格局未变。</p>
+    <p style="margin-top:8px;color:var(--blue);">⚡ 新变化：锂（+7.76%）、电池化学品（+6.39%）、能源金属（+5.81%）成为新主线，资金做多热情向新能源扩散。</p>
+  </div>
+</div>
+
+<!-- 二、热点板块分析 -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">二</span>
+    <h2 class="section-title">热点板块分析</h2>
+  </div>
+
+  <div class="sec-list">
+    <div class="sec-item">
+      <div class="sec-rank">1</div>
+      <div class="sec-name">锂</div>
+      <div class="sec-pct">+7.76%</div>
+      <div class="sec-rps">RPS:10</div>
+    </div>
+    <div class="sec-item">
+      <div class="sec-rank">2</div>
+      <div class="sec-name">电池化学品</div>
+      <div class="sec-pct">+6.39%</div>
+      <div class="sec-rps">RPS:9</div>
+    </div>
+    <div class="sec-item">
+      <div class="sec-rank">3</div>
+      <div class="sec-name">能源金属</div>
+      <div class="sec-pct">+5.81%</div>
+      <div class="sec-rps">RPS:10</div>
+    </div>
+    <div class="sec-item">
+      <div class="sec-rank">4</div>
+      <div class="sec-name">电池</div>
+      <div class="sec-pct">+4.64%</div>
+      <div class="sec-rps">RPS:4</div>
+    </div>
+    <div class="sec-item">
+      <div class="sec-rank">5</div>
+      <div class="sec-name">盐湖提锂</div>
+      <div class="sec-pct">+3.65%</div>
+      <div class="sec-rps">RPS:7</div>
+    </div>
+  </div>
+
+  <div style="margin-top:16px;">
+    <div style="font-size:12px;color:var(--sub);margin-bottom:8px;">🔥 同步走强板块</div>
+    <div class="tag-list">
+      <span class="tag gold">磷化工 +3.45%</span>
+      <span class="tag gold">钠离子电池 +3.16%</span>
+      <span class="tag blue">固态电池 +2.98%</span>
+      <span class="tag">金属锌 +3.06%</span>
+      <span class="tag">钠离子电池</span>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    <h4>🔄 轮动逻辑</h4>
+    <p>资金从前期强势的<strong style="color:var(--gold);">半导体板块向新能源锂电转移</strong>。锂（+7.76%）和电池化学品（+6.39%）涨幅居前，能源金属（+5.81%）持续走强，固态电池、钠离子电池等新技术方向同步爆发，形成<strong>"锂电产业链全景共振"</strong>格局。</p>
+  </div>
+
+  <div class="warning-box">
+    <h4>⚡ 持续性判断</h4>
+    <p>新能源板块今日成交额较大（电池板块合计<strong>6000亿+</strong>），需观察量能是否持续放大。</p>
+    <p style="margin-top:8px;">锂价已处于低位区间多时，今日反弹可能与<strong>新能源汽车销量数据环比改善</strong>或<strong>供给侧消息</strong>有关。短期需关注：① 碳酸锂价格能否企稳反弹；② 固态电池/钠离子电池技术进展。若主线能持续，建议关注锂矿、电池化学品龙头。</p>
+  </div>
+</div>
+
+<!-- 三、核心标的追踪 -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">三</span>
+    <h2 class="section-title">核心标的追踪</h2>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-val" style="color:var(--gold)">3板</div>
+      <div class="stat-label">最高连板</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val up">102</div>
+      <div class="stat-label">涨停总数</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" style="color:var(--green)">22</div>
+      <div class="stat-label">炸板数量</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val" style="color:var(--blue)">17.7%</div>
+      <div class="stat-label">炸板率</div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:16px;">
+    <div style="font-size:12px;color:var(--sub);margin-bottom:8px;">📊 连板梯队</div>
+    <div class="tag-list">
+      <span class="tag">1板 88只</span>
+      <span class="tag">2板 9只</span>
+      <span class="tag gold">3板 2只</span>
+      <span class="tag green">4板+ 0只</span>
+    </div>
+  </div>
+
+  <div style="margin-bottom:16px;">
+    <div style="font-size:12px;color:var(--sub);margin-bottom:8px;">🏆 涨停代表</div>
+    <div class="tag-list">
+      <span class="tag gold">飞马国际 3板</span>
+      <span class="tag gold">越剑智能 3板</span>
+      <span class="tag">锂业/能源金属 多股涨停</span>
+      <span class="tag">电池化学品 领涨</span>
+    </div>
+  </div>
+
+  <div class="success-box">
+    <h4>📋 策略标的验证</h4>
+    <p>前日策略建议关注"口袋支点与RPS突破信号"，今日市场整体赚钱效应扩散，锂电板块多股涨停。连板高度降至3板（前日4板），说明市场风险偏好有所收敛，资金更倾向于<strong>板块轮动而非高举高打</strong>。</p>
+  </div>
+
+  <p style="font-size:13px;color:var(--sub);margin:0;">📌 最高板为飞马国际(002210.SZ)和越剑智能(603095.SH) 3板，连板股数量减少，市场进入"板块轮动、高低切换"阶段。</p>
+</div>
+
+<!-- 四、资金流向 -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">四</span>
+    <h2 class="section-title">资金流向</h2>
+  </div>
+
+  <div class="warning-box">
+    <h4>⚠️ 风险提示</h4>
+    <p>炸板率<strong>17.7%</strong>（22/124），较前日有所抬升，表明追板资金存在分歧。最高连板降至3板，涨停炸板数量增加，短线情绪有所收敛。</p>
+  </div>
+
+  <div class="compare-block">
+    <h4>💎 资金特征</h4>
+    <p>资金呈<strong style="color:var(--gold);">"高低切换、热点扩散"</strong>特征，从高位科技（半导体）向低位新能源（锂电）转移。成交额<strong>25732亿</strong>维持较高水平，市场活跃度良好。</p>
+    <p style="margin-top:8px;">值得注意的是，科创50仅涨0.33%，而创业板涨2.52%，说明资金更青睐<strong>主板/创业板的新能源标的</strong>而非科创板的半导体。</p>
+  </div>
+</div>
+
+<!-- 五、综合研判 -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">五</span>
+    <h2 class="section-title">综合研判</h2>
+  </div>
+
+  <div class="highlight-box">
+    <h4>📈 走势预判</h4>
+    <p>市场呈现<strong style="color:var(--gold);">"反弹延续、热点扩散"</strong>格局。250日差值<strong>+21.1</strong>与5日差值<strong>+21.1</strong>共振，中期趋势向好。创业板指<strong>+2.52%</strong>领涨，市场风格偏向成长。</p>
+    <p style="margin-top:8px;">主线从半导体切换至新能源锂电，热点扩散有利于赚钱效应持续。短期需观察：① 新能源主线能否延续；② 成交额能否维持<strong>2.5万亿+</strong>；③ 站上5日均线比例能否维持55%+。</p>
+  </div>
+
+  <div class="warning-box">
+    <h4>⚠️ 风险提示</h4>
+    <p>连板高度降至3板，炸板率17.7%，短线情绪有所收敛，<strong>追板需谨慎</strong>。</p>
+    <p style="margin-top:8px;">科创50表现滞后（+0.33%），说明科技内部出现分化，前期强势的半导体/AI方向需注意高位回落风险。板块轮动加速，<strong>切忌盲目追涨当日强势板块</strong>。</p>
+  </div>
+</div>
+
+<div class="footer">
+  <p>📊 数据来源：九宽API · 生成时间：2026年4月29日 16:00</p>
+  <p style="margin-top:8px;">⚠️ 本复盘仅供参考，不构成投资建议</p>
+</div>
+
+</body>
+</html>
