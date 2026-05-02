@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>多策略选股 · A股工具箱</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%); min-height: 100vh; color: #212529; font-size: 14px; }
+.top-nav { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 0 24px; display: flex; align-items: center; height: 56px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
+.top-nav a { color: rgba(255,255,255,0.7); text-decoration: none; font-size: 13px; padding: 6px 14px; border-radius: 6px; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+.top-nav a:hover { color: #fff; background: rgba(255,255,255,0.1); }
+.top-nav a.active { color: #ffd700; background: rgba(255,215,0,0.15); }
+.nav-brand { font-size: 16px; font-weight: 700; color: #ffd700 !important; margin-right: 32px; }
+.container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+.hero { text-align: center; padding: 40px 20px 32px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); border-radius: 20px; margin-bottom: 32px; }
+.hero h1 { font-size: 32px; font-weight: 800; color: #fff; margin-bottom: 12px; }
+.hero .subtitle { color: rgba(255,255,255,0.8); font-size: 15px; }
+
+/* 策略选择区 */
+.strategy-selector { background: #fff; border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+.selector-title { font-size: 18px; font-weight: 700; color: #212529; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+.selector-title::before { content: ''; width: 5px; height: 22px; background: linear-gradient(180deg, #ffd700, #ffed4e); border-radius: 3px; }
+.strategy-checkboxes { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.checkbox-item { display: flex; align-items: center; gap: 10px; padding: 12px 16px; background: #f8f9fa; border-radius: 10px; cursor: pointer; transition: all 0.2s; border: 2px solid transparent; }
+.checkbox-item:hover { border-color: #dee2e6; }
+.checkbox-item.selected { border-color: #ffd700; background: rgba(255,215,0,0.05); }
+.checkbox-item input { display: none; }
+.checkbox-icon { width: 22px; height: 22px; border-radius: 6px; border: 2px solid #dee2e6; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: all 0.2s; }
+.checkbox-item.selected .checkbox-icon { background: linear-gradient(135deg, #ffd700, #ffed4e); border-color: #ffd700; color: #212529; }
+.checkbox-label { flex: 1; }
+.checkbox-label .name { font-weight: 600; color: #212529; }
+.checkbox-label .desc { font-size: 12px; color: #868e96; margin-top: 2px; }
+.checkbox-count { font-weight: 700; font-size: 16px; }
+.checkbox-item.s1 .checkbox-count { color: #339af0; }
+.checkbox-item.s2 .checkbox-count { color: #51cf66; }
+.checkbox-item.s3 .checkbox-count { color: #ff6b6b; }
+.checkbox-item.s4 .checkbox-count { color: #845ef7; }
+
+/* 命中数选择 */
+.match-selector { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.match-label { font-weight: 600; color: #495057; }
+.match-btns { display: flex; gap: 8px; }
+.match-btn { padding: 8px 16px; border-radius: 8px; border: 1px solid #dee2e6; background: #fff; color: #495057; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+.match-btn:hover { border-color: #ffd700; }
+.match-btn.active { background: linear-gradient(135deg, #ffd700, #ffed4e); color: #212529; border-color: #ffd700; font-weight: 600; }
+
+/* 搜索栏 */
+.search-bar { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+.search-input { flex: 1; min-width: 200px; padding: 10px 16px; border: 2px solid #e9ecef; border-radius: 10px; font-size: 14px; transition: border-color 0.2s; }
+.search-input:focus { outline: none; border-color: #ffd700; }
+.search-btn { padding: 10px 20px; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #212529; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.search-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(255,215,0,0.3); }
+
+/* 结果区 */
+.result-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.result-count { font-size: 16px; color: #495057; }
+.result-count strong { color: #ffd700; font-size: 20px; }
+.table-wrap { background: #fff; border-radius: 12px; overflow: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.06); margin-bottom: 20px; }
+table { width: 100%; border-collapse: collapse; }
+th { padding: 12px 14px; text-align: left; font-size: 11px; font-weight: 700; color: #495057; border-bottom: 2px solid #dee2e6; white-space: nowrap; cursor: pointer; background: #fafbfc; }
+th:hover { background: #f0f0f0; }
+td { padding: 10px 14px; border-bottom: 1px solid #f1f3f5; font-size: 12px; vertical-align: middle; }
+tr:hover { background: #f8f9fa; }
+.code { font-family: monospace; color: #339af0; cursor: pointer; padding: 2px 8px; background: rgba(51,154,240,0.1); border-radius: 4px; font-size: 12px; }
+.code:hover { background: #339af0; color: #fff; }
+.name { font-weight: 600; cursor: pointer; color: #212529; }
+.name:hover { color: #ffd700; }
+.tag { display: inline-block; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 600; margin: 1px; }
+.tag-s1 { background: rgba(51,154,240,0.15); color: #339af0; border: 1px solid rgba(51,154,240,0.3); }
+.tag-s2 { background: rgba(81,207,102,0.15); color: #51cf66; border: 1px solid rgba(81,207,102,0.3); }
+.tag-s3 { background: rgba(255,107,107,0.15); color: #ff6b6b; border: 1px solid rgba(255,107,107,0.3); }
+.tag-s4 { background: rgba(132,94,247,0.15); color: #845ef7; border: 1px solid rgba(132,94,247,0.3); }
+.pos { color: #ff6b6b; font-weight: 600; }
+.neg { color: #51cf66; font-weight: 600; }
+
+/* 分页 */
+.pagination { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 16px 0 8px; flex-wrap: wrap; }
+.pg-btn { min-width: 36px; height: 36px; border-radius: 8px; border: 1px solid #dee2e6; background: #fff; color: #495057; cursor: pointer; font-size: 13px; }
+.pg-btn.active { background: linear-gradient(135deg, #ffd700, #ffed4e); color: #212529; border-color: #ffd700; font-weight: 700; }
+.pg-btn:disabled { opacity: 0.4; cursor: default; }
+.pg-info { font-size: 12px; color: #868e96; padding: 0 8px; }
+
+/* 空状态 */
+.empty-state { text-align: center; padding: 60px 20px; color: #868e96; }
+.empty-state .icon { font-size: 64px; margin-bottom: 16px; }
+.empty-state h3 { font-size: 18px; margin-bottom: 8px; color: #495057; }
+.empty-state p { font-size: 14px; }
+
+.footer { text-align: center; padding: 24px; color: #868e96; font-size: 12px; }
+@media (max-width: 768px) {
+  .strategy-checkboxes { grid-template-columns: 1fr; }
+  .container { padding: 16px; }
+}
+</style>
+</head>
+<body>
+<nav class="top-nav">
+  <a href="index.html" class="nav-brand">📊 A股工具箱</a>
+  <a href="index.html">🏠 首页</a>
+  <a href="市场复盘_20260430_v4.html">📈 每日复盘</a>
+  <a href="选股策略_导航.html">🎯 选股策略</a>
+  <a href="选股策略_多策略.html" class="active">🔀 多策略</a>
+  <a href="选股策略_自定义上传.html">📤 自定义策略</a>
+</nav>
+
+<div class="container">
+  <div class="hero">
+    <h1>🔀 多策略组合选股</h1>
+    <div class="subtitle">选择多条策略，查看同时命中多条策略的优质股票</div>
+  </div>
+
+  <!-- 策略选择 -->
+  <div class="strategy-selector">
+    <div class="selector-title">选择策略（可多选）</div>
+    <div class="strategy-checkboxes">
+      <label class="checkbox-item s1" data-strategy="s1">
+        <input type="checkbox" value="s1">
+        <span class="checkbox-icon">✓</span>
+        <div class="checkbox-label">
+          <div class="name">💎 持股增长</div>
+          <div class="desc">前十大股东连续增持</div>
+        </div>
+        <span class="checkbox-count" id="count-s1">0</span>
+      </label>
+      <label class="checkbox-item s2" data-strategy="s2">
+        <input type="checkbox" value="s2">
+        <span class="checkbox-icon">✓</span>
+        <div class="checkbox-label">
+          <div class="name">📈 盈利质量</div>
+          <div class="desc">ROE·毛利·净利三年升</div>
+        </div>
+        <span class="checkbox-count" id="count-s2">0</span>
+      </label>
+      <label class="checkbox-item s3" data-strategy="s3">
+        <input type="checkbox" value="s3">
+        <span class="checkbox-icon">✓</span>
+        <div class="checkbox-label">
+          <div class="name">🚀 全速前进</div>
+          <div class="desc">扣非净利+营收双加速</div>
+        </div>
+        <span class="checkbox-count" id="count-s3">0</span>
+      </label>
+      <label class="checkbox-item s4" data-strategy="s4">
+        <input type="checkbox" value="s4">
+        <span class="checkbox-icon">✓</span>
+        <div class="checkbox-label">
+          <div class="name">🏢 机构持股增长</div>
+          <div class="desc">机构持股连续增持</div>
+        </div>
+        <span class="checkbox-count" id="count-s4">0</span>
+      </label>
+    </div>
+
+    <div class="match-selector">
+      <span class="match-label">命中数要求：</span>
+      <div class="match-btns">
+        <button class="match-btn active" data-match="1">命中任意1条</button>
+        <button class="match-btn" data-match="2">命中2条及以上</button>
+        <button class="match-btn" data-match="3">命中3条及以上</button>
+        <button class="match-btn" data-match="4">全部4条命中</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 搜索 -->
+  <div class="search-bar">
+    <input type="text" class="search-input" id="search-input" placeholder="搜索股票代码或名称...">
+    <button class="search-btn" onclick="doSearch()">🔍 搜索</button>
+  </div>
+
+  <!-- 结果 -->
+  <div class="result-header" id="result-header" style="display:none;">
+    <div class="result-count">共找到 <strong id="total-count">0</strong> 只股票</div>
+  </div>
+
+  <div class="table-wrap" id="table-container" style="display:none;">
+    <table>
+      <thead>
+        <tr>
+          <th onclick="sortTable('code')">代码 <span class="sort-icon">⇅</span></th>
+          <th onclick="sortTable('name')">名称 <span class="sort-icon">⇅</span></th>
+          <th onclick="sortTable('industry')">行业 <span class="sort-icon">⇅</span></th>
+          <th>策略命中</th>
+          <th onclick="sortTable('hitCount')">命中数 <span class="sort-icon">⇅</span></th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+
+  <!-- 空状态 -->
+  <div class="empty-state" id="empty-state">
+    <div class="icon">📋</div>
+    <h3>请选择策略</h3>
+    <p>在上方选择1-4条策略，然后查看同时命中多条策略的股票</p>
+  </div>
+
+  <!-- 分页 -->
+  <div class="pagination" id="pagination"></div>
+
+  <div class="footer">数据来源：策略筛选结果_v3.xlsx | 更新：2026-05-02</div>
+</div>
+
+<script>
+// 全局数据
+let allData = [];
+let filteredData = [];
+let currentPage = 1;
+let pageSize = 50;
+let selectedStrategies = new Set();
+let minMatchCount = 1;
+let currentSort = { col: 'hitCount', asc: false };
+
+// 加载数据
+async function loadData() {
+  try {
+    const res = await fetch('strategy_data.json');
+    allData = await res.json();
+    // 更新各策略计数
+    document.getElementById('count-s1').textContent = allData.filter(d => d.s1).length;
+    document.getElementById('count-s2').textContent = allData.filter(d => d.s2).length;
+    document.getElementById('count-s3').textContent = allData.filter(d => d.s3).length;
+    document.getElementById('count-s4').textContent = allData.filter(d => d.s4).length;
+  } catch (e) {
+    console.error('加载数据失败:', e);
+  }
+}
+
+// 策略选择
+document.querySelectorAll('.checkbox-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const checkbox = item.querySelector('input');
+    checkbox.checked = !checkbox.checked;
+    item.classList.toggle('selected', checkbox.checked);
+    updateSelectedStrategies();
+  });
+});
+
+// 更新选中的策略
+function updateSelectedStrategies() {
+  selectedStrategies = new Set();
+  document.querySelectorAll('.checkbox-item input:checked').forEach(cb => {
+    selectedStrategies.add(cb.value);
+  });
+  filterAndRender();
+}
+
+// 命中数选择
+document.querySelectorAll('.match-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.match-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    minMatchCount = parseInt(btn.dataset.match);
+    filterAndRender();
+  });
+});
+
+// 过滤和渲染
+function filterAndRender() {
+  if (selectedStrategies.size === 0) {
+    filteredData = [];
+    document.getElementById('empty-state').style.display = 'block';
+    document.getElementById('table-container').style.display = 'none';
+    document.getElementById('result-header').style.display = 'none';
+    return;
+  }
+
+  // 过滤
+  filteredData = allData.filter(d => {
+    const hitCount = getHitCount(d);
+    return hitCount >= minMatchCount;
+  });
+
+  // 排序
+  sortData();
+
+  // 搜索过滤
+  const searchText = document.getElementById('search-input').value.trim().toLowerCase();
+  if (searchText) {
+    filteredData = filteredData.filter(d =>
+      d.code.toLowerCase().includes(searchText) ||
+      d.name.toLowerCase().includes(searchText)
+    );
+  }
+
+  // 更新显示
+  document.getElementById('empty-state').style.display = 'none';
+  document.getElementById('table-container').style.display = 'block';
+  document.getElementById('result-header').style.display = 'flex';
+  document.getElementById('total-count').textContent = filteredData.length;
+
+  // 分页
+  currentPage = 1;
+  renderTable();
+  renderPagination();
+}
+
+// 获取命中数
+function getHitCount(d) {
+  let count = 0;
+  if (selectedStrategies.has('s1') && d.s1) count++;
+  if (selectedStrategies.has('s2') && d.s2) count++;
+  if (selectedStrategies.has('s3') && d.s3) count++;
+  if (selectedStrategies.has('s4') && d.s4) count++;
+  return count;
+}
+
+// 排序
+function sortData() {
+  filteredData.sort((a, b) => {
+    let va, vb;
+    if (currentSort.col === 'hitCount') {
+      va = getHitCount(a);
+      vb = getHitCount(b);
+    } else if (currentSort.col === 'code') {
+      va = a.code;
+      vb = b.code;
+    } else if (currentSort.col === 'name') {
+      va = a.name;
+      vb = b.name;
+    } else if (currentSort.col === 'industry') {
+      va = a.industry;
+      vb = b.industry;
+    }
+    if (typeof va === 'string') {
+      return currentSort.asc ? va.localeCompare(vb) : vb.localeCompare(va);
+    }
+    return currentSort.asc ? va - vb : vb - va;
+  });
+}
+
+// 排序表头
+function sortTable(col) {
+  if (currentSort.col === col) {
+    currentSort.asc = !currentSort.asc;
+  } else {
+    currentSort.col = col;
+    currentSort.asc = false;
+  }
+  sortData();
+  renderTable();
+}
+
+// 渲染表格
+function renderTable() {
+  const tbody = document.getElementById('table-body');
+  const start = (currentPage - 1) * pageSize;
+  const end = start + pageSize;
+  const pageData = filteredData.slice(start, end);
+
+  tbody.innerHTML = pageData.map(d => {
+    const hitCount = getHitCount(d);
+    const tags = [];
+    if (d.s1) tags.push('<span class="tag tag-s1">持股增长</span>');
+    if (d.s2) tags.push('<span class="tag tag-s2">盈利质量</span>');
+    if (d.s3) tags.push('<span class="tag tag-s3">全速前进</span>');
+    if (d.s4) tags.push('<span class="tag tag-s4">机构持股</span>');
+
+    return `<tr>
+      <td><span class="code" onclick="showDetail('${d.code}')">${d.code}</span></td>
+      <td><span class="name" onclick="showDetail('${d.code}')">${d.name}</span></td>
+      <td>${d.industry || '-'}</td>
+      <td>${tags.join(' ')}</td>
+      <td class="${hitCount >= 3 ? 'pos' : ''}">${hitCount}</td>
+    </tr>`;
+  }).join('');
+}
+
+// 渲染分页
+function renderPagination() {
+  const totalPages = Math.ceil(filteredData.length / pageSize);
+  const container = document.getElementById('pagination');
+
+  if (totalPages <= 1) {
+    container.innerHTML = '';
+    return;
+  }
+
+  let html = '';
+  html += `<button class="pg-btn" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>‹</button>`;
+
+  const pages = getPageNumbers(totalPages);
+  pages.forEach(p => {
+    if (p === '...') {
+      html += `<span class="pg-info">...</span>`;
+    } else {
+      html += `<button class="pg-btn ${p === currentPage ? 'active' : ''}" onclick="goPage(${p})">${p}</button>`;
+    }
+  });
+
+  html += `<button class="pg-btn" onclick="goPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>›</button>`;
+  html += `<span class="pg-info">${currentPage}/${totalPages}</span>`;
+
+  container.innerHTML = html;
+}
+
+function getPageNumbers(total) {
+  const pages = [];
+  if (total <= 7) {
+    for (let i = 1; i <= total; i++) pages.push(i);
+  } else {
+    pages.push(1);
+    if (currentPage > 3) pages.push('...');
+    for (let i = Math.max(2, currentPage - 1); i <= Math.min(total - 1, currentPage + 1); i++) {
+      pages.push(i);
+    }
+    if (currentPage < total - 2) pages.push('...');
+    pages.push(total);
+  }
+  return pages;
+}
+
+function goPage(page) {
+  currentPage = page;
+  renderTable();
+  renderPagination();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// 搜索
+function doSearch() {
+  filterAndRender();
+}
+
+document.getElementById('search-input').addEventListener('keypress', e => {
+  if (e.key === 'Enter') doSearch();
+});
+
+// 股票详情
+function showDetail(code) {
+  window.open(`stock_detail.html?code=${code}`, '_blank');
+}
+
+// 初始化
+loadData();
+</script>
+</body>
+</html>
