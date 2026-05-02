@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>自定义策略上传 · A股工具箱</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%); min-height: 100vh; color: #212529; font-size: 14px; }
+.top-nav { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding: 0 24px; display: flex; align-items: center; height: 56px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
+.top-nav a { color: rgba(255,255,255,0.7); text-decoration: none; font-size: 13px; padding: 6px 14px; border-radius: 6px; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+.top-nav a:hover { color: #fff; background: rgba(255,255,255,0.1); }
+.top-nav a.active { color: #ffd700; background: rgba(255,215,0,0.15); }
+.nav-brand { font-size: 16px; font-weight: 700; color: #ffd700 !important; margin-right: 32px; }
+.container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+.hero { text-align: center; padding: 40px 20px 32px; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); border-radius: 20px; margin-bottom: 32px; }
+.hero h1 { font-size: 32px; font-weight: 800; color: #fff; margin-bottom: 12px; }
+.hero .subtitle { color: rgba(255,255,255,0.8); font-size: 15px; }
+
+/* 上传区 */
+.upload-section { background: #fff; border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+.section-title { font-size: 18px; font-weight: 700; color: #212529; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+.section-title::before { content: ''; width: 5px; height: 22px; background: linear-gradient(180deg, #ffd700, #ffed4e); border-radius: 3px; }
+.form-group { margin-bottom: 20px; }
+.form-label { display: block; font-weight: 600; color: #495057; margin-bottom: 8px; }
+.form-input { width: 100%; padding: 12px 16px; border: 2px solid #e9ecef; border-radius: 10px; font-size: 14px; transition: border-color 0.2s; }
+.form-input:focus { outline: none; border-color: #ffd700; }
+.file-upload-area { border: 2px dashed #dee2e6; border-radius: 12px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 20px; background: #fafbfc; }
+.file-upload-area:hover { border-color: #ffd700; background: rgba(255,215,0,0.05); }
+.file-upload-area .icon { font-size: 48px; margin-bottom: 12px; }
+.file-upload-area p { color: #868e96; font-size: 14px; margin: 4px 0; }
+.file-upload-area .highlight { color: #ffd700; font-weight: 600; }
+.file-upload-area .hint { font-size: 12px; color: #adb5bd; margin-top: 8px; }
+#file-input { display: none; }
+.selected-file { display: none; background: rgba(255,215,0,0.1); border: 1px solid rgba(255,215,0,0.3); border-radius: 10px; padding: 16px; margin-bottom: 20px; align-items: center; gap: 12px; }
+.selected-file.show { display: flex; }
+.selected-file .file-icon { font-size: 24px; }
+.selected-file .file-info { flex: 1; }
+.selected-file .file-name { font-weight: 600; color: #212529; }
+.selected-file .file-size { font-size: 12px; color: #868e96; }
+.selected-file .remove-btn { background: none; border: none; color: #868e96; cursor: pointer; font-size: 20px; padding: 4px 8px; }
+.selected-file .remove-btn:hover { color: #ff6b6b; }
+.btn-row { display: flex; gap: 12px; }
+.btn { padding: 12px 24px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+.btn-primary { background: linear-gradient(135deg, #ffd700, #ffed4e); color: #212529; border: none; }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(255,215,0,0.3); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.btn-secondary { background: #fff; border: 1px solid #dee2e6; color: #495057; }
+.btn-secondary:hover { border-color: #ffd700; }
+
+/* 结果区 */
+.result-section { background: #fff; border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); display: none; }
+.result-section.show { display: block; }
+.result-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.summary-card { background: linear-gradient(135deg, #f8f9fa, #fff); border-radius: 12px; padding: 20px; text-align: center; border: 1px solid #e9ecef; }
+.summary-card .num { font-size: 32px; font-weight: 800; color: #ffd700; }
+.summary-card .label { font-size: 12px; color: #868e96; margin-top: 4px; }
+.summary-card.s1 .num { color: #339af0; }
+.summary-card.s2 .num { color: #51cf66; }
+.summary-card.s3 .num { color: #ff6b6b; }
+.summary-card.s4 .num { color: #845ef7; }
+
+/* 标签筛选 */
+.filter-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.filter-tab { padding: 8px 16px; border-radius: 20px; border: 1px solid #dee2e6; background: #fff; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+.filter-tab:hover { border-color: #ffd700; }
+.filter-tab.active { background: linear-gradient(135deg, #ffd700, #ffed4e); color: #212529; border-color: #ffd700; font-weight: 600; }
+.filter-tab .count { background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 10px; font-size: 11px; margin-left: 4px; }
+
+.table-wrap { overflow: auto; }
+table { width: 100%; border-collapse: collapse; }
+th { padding: 12px 14px; text-align: left; font-size: 11px; font-weight: 700; color: #495057; border-bottom: 2px solid #dee2e6; white-space: nowrap; background: #fafbfc; }
+td { padding: 10px 14px; border-bottom: 1px solid #f1f3f5; font-size: 12px; vertical-align: middle; }
+tr:hover { background: #f8f9fa; }
+.code { font-family: monospace; color: #339af0; cursor: pointer; padding: 2px 8px; background: rgba(51,154,240,0.1); border-radius: 4px; font-size: 12px; }
+.code:hover { background: #339af0; color: #fff; }
+.name { font-weight: 600; cursor: pointer; color: #212529; }
+.name:hover { color: #ffd700; }
+.tag { display: inline-block; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 600; margin: 1px; }
+.tag-s1 { background: rgba(51,154,240,0.15); color: #339af0; border: 1px solid rgba(51,154,240,0.3); }
+.tag-s2 { background: rgba(81,207,102,0.15); color: #51cf66; border: 1px solid rgba(81,207,102,0.3); }
+.tag-s3 { background: rgba(255,107,107,0.15); color: #ff6b6b; border: 1px solid rgba(255,107,107,0.3); }
+.tag-s4 { background: rgba(132,94,247,0.15); color: #845ef7; border: 1px solid rgba(132,94,247,0.3); }
+.tag-none { background: #f1f3f5; color: #868e96; border: 1px solid #dee2e6; }
+.pos { color: #ff6b6b; font-weight: 600; }
+
+/* 历史记录 */
+.history-section { background: #fff; border-radius: 16px; padding: 24px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+.history-list { display: flex; flex-direction: column; gap: 12px; }
+.history-item { display: flex; align-items: center; gap: 16px; padding: 16px; background: #f8f9fa; border-radius: 10px; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; }
+.history-item:hover { border-color: #ffd700; background: #fff; }
+.history-icon { font-size: 28px; }
+.history-info { flex: 1; }
+.history-name { font-weight: 600; color: #212529; }
+.history-meta { font-size: 12px; color: #868e96; margin-top: 2px; }
+.history-stats { display: flex; gap: 8px; flex-wrap: wrap; }
+.history-stat { font-size: 11px; padding: 2px 8px; border-radius: 4px; }
+.history-delete { background: none; border: none; color: #868e96; cursor: pointer; font-size: 18px; padding: 4px 8px; border-radius: 4px; }
+.history-delete:hover { background: #ff6b6b; color: #fff; }
+.empty-history { text-align: center; padding: 40px; color: #868e96; }
+.empty-history .icon { font-size: 48px; margin-bottom: 12px; }
+
+/* 模态框 */
+.modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; padding: 24px; }
+.modal.show { display: flex; }
+.modal-content { background: #fff; border-radius: 16px; max-width: 90vw; max-height: 90vh; overflow: auto; padding: 24px; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #dee2e6; }
+.modal-title { font-size: 18px; font-weight: 700; }
+.modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #868e96; }
+.modal-close:hover { color: #212529; }
+
+.footer { text-align: center; padding: 24px; color: #868e96; font-size: 12px; }
+@media (max-width: 768px) {
+  .container { padding: 16px; }
+  .result-summary { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+<nav class="top-nav">
+  <a href="index.html" class="nav-brand">📊 A股工具箱</a>
+  <a href="index.html">🏠 首页</a>
+  <a href="市场复盘_20260430_v4.html">📈 每日复盘</a>
+  <a href="选股策略_导航.html">🎯 选股策略</a>
+  <a href="选股策略_多策略.html">🔀 多策略</a>
+  <a href="选股策略_自定义上传.html" class="active">📤 自定义策略</a>
+</nav>
+
+<div class="container">
+  <div class="hero">
+    <h1>📤 自定义策略上传</h1>
+    <div class="subtitle">上传股票列表，自动识别命中了哪些选股策略</div>
+  </div>
+
+  <!-- 上传表单 -->
+  <div class="upload-section">
+    <div class="section-title">上传股票列表</div>
+    <div class="form-group">
+      <label class="form-label">策略名称</label>
+      <input type="text" class="form-input" id="strategy-name" placeholder="例如：净利润断层、量化选股等">
+    </div>
+    <div class="form-group">
+      <label class="form-label">选择Excel文件</label>
+      <div class="file-upload-area" id="upload-area" onclick="document.getElementById('file-input').click()">
+        <div class="icon">📁</div>
+        <p>点击或拖拽文件到此处上传</p>
+        <p class="highlight">支持 .xlsx, .xls 格式</p>
+        <p class="hint">文件需包含"代码"或"股票代码"列，以及"名称"列</p>
+      </div>
+      <input type="file" id="file-input" accept=".xlsx,.xls">
+      <div class="selected-file" id="selected-file">
+        <span class="file-icon">📄</span>
+        <div class="file-info">
+          <div class="file-name" id="file-name"></div>
+          <div class="file-size" id="file-size"></div>
+        </div>
+        <button class="remove-btn" onclick="clearFile()">×</button>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="analyze-btn" onclick="analyzeFile()" disabled>
+        🔍 分析股票
+      </button>
+    </div>
+  </div>
+
+  <!-- 分析结果 -->
+  <div class="result-section" id="result-section">
+    <div class="section-title">分析结果</div>
+    <div class="result-summary" id="result-summary"></div>
+    <div class="filter-tabs" id="filter-tabs"></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>代码</th>
+            <th>名称</th>
+            <th>策略一<br>持股增长</th>
+            <th>策略二<br>盈利质量</th>
+            <th>策略三<br>全速前进</th>
+            <th>策略四<br>机构持股</th>
+            <th>命中数</th>
+          </tr>
+        </thead>
+        <tbody id="result-table"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 历史记录 -->
+  <div class="history-section">
+    <div class="section-title">历史记录</div>
+    <div class="history-list" id="history-list">
+      <div class="empty-history">
+        <div class="icon">📋</div>
+        <p>暂无上传记录</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 详情模态框 -->
+<div class="modal" id="detail-modal">
+  <div class="modal-content" style="width:800px;">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">股票详情</span>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// 全局数据
+let allData = [];        // 策略数据
+let uploadedStocks = []; // 上传的股票列表
+let currentFilter = 'all';
+let history = [];        // 历史记录
+
+// 加载策略数据
+async function loadStrategyData() {
+  try {
+    const res = await fetch('strategy_data.json');
+    allData = await res.json();
+  } catch (e) {
+    console.error('加载策略数据失败:', e);
+  }
+}
+
+// 加载历史记录
+function loadHistory() {
+  const stored = localStorage.getItem('custom_strategies');
+  history = stored ? JSON.parse(stored) : [];
+  renderHistory();
+}
+
+// 保存历史记录
+function saveHistory() {
+  localStorage.setItem('custom_strategies', JSON.stringify(history));
+}
+
+// 文件选择
+document.getElementById('file-input').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (file) {
+    showSelectedFile(file);
+  }
+});
+
+// 拖拽上传
+const uploadArea = document.getElementById('upload-area');
+uploadArea.addEventListener('dragover', e => {
+  e.preventDefault();
+  uploadArea.style.borderColor = '#ffd700';
+  uploadArea.style.background = 'rgba(255,215,0,0.1)';
+});
+uploadArea.addEventListener('dragleave', e => {
+  e.preventDefault();
+  uploadArea.style.borderColor = '#dee2e6';
+  uploadArea.style.background = '';
+});
+uploadArea.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadArea.style.borderColor = '#dee2e6';
+  uploadArea.style.background = '';
+  const file = e.dataTransfer.files[0];
+  if (file && (file.name.endsWith('.xlsx') || file.name.endsWith('.xls'))) {
+    showSelectedFile(file);
+  } else {
+    alert('请上传Excel文件(.xlsx或.xls)');
+  }
+});
+
+function showSelectedFile(file) {
+  document.getElementById('file-name').textContent = file.name;
+  document.getElementById('file-size').textContent = formatFileSize(file.size);
+  document.getElementById('selected-file').classList.add('show');
+  document.getElementById('analyze-btn').disabled = false;
+}
+
+function clearFile() {
+  document.getElementById('file-input').value = '';
+  document.getElementById('selected-file').classList.remove('show');
+  document.getElementById('analyze-btn').disabled = true;
+  uploadedStocks = [];
+  document.getElementById('result-section').classList.remove('show');
+}
+
+function formatFileSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
+// 分析文件
+async function analyzeFile() {
+  const fileInput = document.getElementById('file-input');
+  const file = fileInput.files[0];
+  const strategyName = document.getElementById('strategy-name').value.trim();
+
+  if (!file) {
+    alert('请选择文件');
+    return;
+  }
+
+  if (!strategyName) {
+    alert('请输入策略名称');
+    return;
+  }
+
+  // 读取Excel文件
+  const formData = new FormData();
+  formData.append('file', file);
+
+  // 使用内置方式解析Excel（需要SheetJS库）
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const data = new Uint8Array(arrayBuffer);
+    const workbook = XLSX.read(data, { type: 'array' });
+    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+    const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+
+    // 提取股票代码和名称
+    uploadedStocks = jsonData.map(row => {
+      // 尝试多种列名
+      const code = row['代码'] || row['股票代码'] || row['code'] || row['证券代码'] || '';
+      const name = row['名称'] || row['名称(607)'] || row['股票名称'] || row['name'] || row['证券名称'] || '';
+      return {
+        code: String(code).replace(/^"=|"$/g, '').trim(), // 处理Excel格式
+        name: String(name).trim()
+      };
+    }).filter(s => s.code && s.code.length >= 4);
+
+    if (uploadedStocks.length === 0) {
+      alert('未找到有效的股票代码，请确保文件包含"代码"和"名称"列');
+      return;
+    }
+
+    // 与策略数据匹配
+    const codeMap = {};
+    allData.forEach(s => {
+      codeMap[s.code] = s;
+    });
+
+    // 为每个上传的股票匹配策略命中情况
+    uploadedStocks = uploadedStocks.map(stock => {
+      const matched = codeMap[stock.code] || {};
+      return {
+        ...stock,
+        s1: matched.s1 || false,
+        s2: matched.s2 || false,
+        s3: matched.s3 || false,
+        s4: matched.s4 || false,
+        s1_sub: matched.s1_sub || false,
+        s4_sub: matched.s4_sub || false,
+        hitCount: [matched.s1, matched.s2, matched.s3, matched.s4].filter(Boolean).length
+      };
+    });
+
+    // 保存到历史记录
+    const record = {
+      id: Date.now(),
+      name: strategyName,
+      date: new Date().toLocaleString('zh-CN'),
+      stockCount: uploadedStocks.length,
+      stocks: uploadedStocks,
+      fileName: file.name
+    };
+
+    history.unshift(record);
+    saveHistory();
+    renderHistory();
+
+    // 显示结果
+    showResults();
+
+  } catch (e) {
+    console.error('解析文件失败:', e);
+    alert('解析文件失败：' + e.message);
+  }
+}
+
+// 显示结果
+function showResults() {
+  const section = document.getElementById('result-section');
+  section.classList.add('show');
+
+  // 统计
+  const stats = {
+    total: uploadedStocks.length,
+    s1: uploadedStocks.filter(s => s.s1).length,
+    s2: uploadedStocks.filter(s => s.s2).length,
+    s3: uploadedStocks.filter(s => s.s3).length,
+    s4: uploadedStocks.filter(s => s.s4).length,
+    any: uploadedStocks.filter(s => s.hitCount > 0).length,
+    none: uploadedStocks.filter(s => s.hitCount === 0).length
+  };
+
+  document.getElementById('result-summary').innerHTML = `
+    <div class="summary-card">
+      <div class="num">${stats.total}</div>
+      <div class="label">上传股票</div>
+    </div>
+    <div class="summary-card">
+      <div class="num">${stats.any}</div>
+      <div class="label">命中策略</div>
+    </div>
+    <div class="summary-card s1">
+      <div class="num">${stats.s1}</div>
+      <div class="label">持股增长</div>
+    </div>
+    <div class="summary-card s2">
+      <div class="num">${stats.s2}</div>
+      <div class="label">盈利质量</div>
+    </div>
+    <div class="summary-card s3">
+      <div class="num">${stats.s3}</div>
+      <div class="label">全速前进</div>
+    </div>
+    <div class="summary-card s4">
+      <div class="num">${stats.s4}</div>
+      <div class="label">机构持股</div>
+    </div>
+  `;
+
+  // 筛选标签
+  document.getElementById('filter-tabs').innerHTML = `
+    <button class="filter-tab active" onclick="setFilter('all')">全部 <span class="count">${stats.total}</span></button>
+    <button class="filter-tab" onclick="setFilter('any')">命中策略 <span class="count">${stats.any}</span></button>
+    <button class="filter-tab" onclick="setFilter('none')">未命中 <span class="count">${stats.none}</span></button>
+  `;
+
+  renderTable();
+}
+
+// 筛选
+function setFilter(filter) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-tab').forEach(tab => {
+    tab.classList.toggle('active', tab.textContent.includes(filter === 'all' ? '全部' : filter === 'any' ? '命中' : '未命中'));
+  });
+  renderTable();
+}
+
+// 渲染表格
+function renderTable() {
+  let data = uploadedStocks;
+  if (currentFilter === 'any') {
+    data = data.filter(s => s.hitCount > 0);
+  } else if (currentFilter === 'none') {
+    data = data.filter(s => s.hitCount === 0);
+  }
+
+  const tbody = document.getElementById('result-table');
+  tbody.innerHTML = data.map(s => {
+    const s1Class = s.s1 ? 'tag tag-s1' : 'tag tag-none';
+    const s2Class = s.s2 ? 'tag tag-s2' : 'tag tag-none';
+    const s3Class = s.s3 ? 'tag tag-s3' : 'tag tag-none';
+    const s4Class = s.s4 ? 'tag tag-s4' : 'tag tag-none';
+    const s1Text = s.s1 ? (s.s1_sub ? '✓ 加速度' : '✓') : '✗';
+    const s2Text = s.s2 ? '✓' : '✗';
+    const s3Text = s.s3 ? '✓' : '✗';
+    const s4Text = s.s4 ? (s.s4_sub ? '✓ 加速度' : '✓') : '✗';
+
+    return `<tr>
+      <td><span class="code" onclick="showDetail('${s.code}')">${s.code}</span></td>
+      <td><span class="name" onclick="showDetail('${s.code}')">${s.name || '-'}</span></td>
+      <td><span class="${s1Class}">${s1Text}</span></td>
+      <td><span class="${s2Class}">${s2Text}</span></td>
+      <td><span class="${s3Class}">${s3Text}</span></td>
+      <td><span class="${s4Class}">${s4Text}</span></td>
+      <td class="${s.hitCount >= 2 ? 'pos' : ''}">${s.hitCount}</td>
+    </tr>`;
+  }).join('');
+}
+
+// 渲染历史记录
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  if (history.length === 0) {
+    list.innerHTML = `
+      <div class="empty-history">
+        <div class="icon">📋</div>
+        <p>暂无上传记录</p>
+      </div>
+    `;
+    return;
+  }
+
+  list.innerHTML = history.map((record, index) => `
+    <div class="history-item" onclick="loadHistoryRecord(${index})">
+      <span class="history-icon">📊</span>
+      <div class="history-info">
+        <div class="history-name">${record.name}</div>
+        <div class="history-meta">${record.date} · ${record.stockCount}只股票 · ${record.fileName}</div>
+      </div>
+      <div class="history-stats">
+        <span class="history-stat" style="background:rgba(51,154,240,0.15);color:#339af0;">持股 ${record.stocks.filter(s=>s.s1).length}</span>
+        <span class="history-stat" style="background:rgba(81,207,102,0.15);color:#51cf66;">盈利 ${record.stocks.filter(s=>s.s2).length}</span>
+        <span class="history-stat" style="background:rgba(255,107,107,0.15);color:#ff6b6b;">全速 ${record.stocks.filter(s=>s.s3).length}</span>
+        <span class="history-stat" style="background:rgba(132,94,247,0.15);color:#845ef7;">机构 ${record.stocks.filter(s=>s.s4).length}</span>
+      </div>
+      <button class="history-delete" onclick="event.stopPropagation(); deleteHistory(${index})">×</button>
+    </div>
+  `).join('');
+}
+
+// 加载历史记录
+function loadHistoryRecord(index) {
+  const record = history[index];
+  document.getElementById('strategy-name').value = record.name;
+  uploadedStocks = record.stocks;
+  showResults();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// 删除历史记录
+function deleteHistory(index) {
+  if (confirm('确定删除这条记录吗？')) {
+    history.splice(index, 1);
+    saveHistory();
+    renderHistory();
+  }
+}
+
+// 股票详情
+function showDetail(code) {
+  window.open(`stock_detail.html?code=${code}`, '_blank');
+}
+
+// 关闭模态框
+function closeModal() {
+  document.getElementById('detail-modal').classList.remove('show');
+}
+
+// 初始化
+loadStrategyData();
+loadHistory();
+
+// 动态加载SheetJS库
+if (typeof XLSX === 'undefined') {
+  const script = document.createElement('script');
+  script.src = 'https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js';
+  document.head.appendChild(script);
+}
+</script>
+</body>
+</html>
