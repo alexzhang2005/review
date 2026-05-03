@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -58,6 +58,11 @@ body {
 .stock-code { font-size: 14px; background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.8); padding: 4px 12px; border-radius: 6px; font-family: 'SF Mono', 'Consolas', monospace; }
 .stock-meta { display: flex; gap: 16px; margin-top: 12px; flex-wrap: wrap; position: relative; }
 .stock-meta span { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.9); padding: 4px 12px; border-radius: 20px; font-size: 12px; }
+
+/* 加载状�?*/
+.loading-indicator { display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.7); font-size: 13px; }
+.loading-indicator .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #ffd700; border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
 
 /* 跟踪信息模块 */
 .tracking-section {
@@ -130,8 +135,34 @@ body {
 .info-value.highlight { color: #ffd700; font-size: 20px; }
 .section-subtitle { font-size: 15px; font-weight: 600; color: #212529; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; padding-left: 8px; border-left: 3px solid #dee2e6; }
 .tag-cloud { display: flex; flex-wrap: wrap; gap: 6px; }
-.concept-tag { background: linear-gradient(135deg, rgba(132,94,247,0.1), rgba(132,94,247,0.05)); color: #845ef7; border: 1px solid rgba(132,94,247,0.2); padding: 5px 12px; border-radius: 6px; font-size: 12px; transition: all 0.2s; cursor: default; }
+.concept-tag { background: linear-gradient(135deg, rgba(132,94,247,0.1), rgba(132,94,247,0.05)); color: #845ef7; border: 1px solid rgba(132,94,247,0.2); padding: 5px 12px; border-radius: 6px; font-size: 12px; transition: all 0.2s; cursor: pointer; }
 .concept-tag:hover { background: #845ef7; color: #fff; }
+.concept-tag.active { background: #845ef7; color: #fff; }
+
+/* 同概念股票列�?*/
+.related-stocks-list { display: flex; flex-direction: column; gap: 8px; }
+.related-stock-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+.related-stock-item:hover {
+  background: #fff;
+  border-color: #845ef7;
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(132,94,247,0.15);
+}
+.related-stock-item .stock-name { font-weight: 600; color: #212529; flex: 1; }
+.related-stock-item .stock-code { color: #6c757d; font-size: 12px; font-family: monospace; }
+.related-stock-item .stock-strategies { font-size: 11px; color: #845ef7; background: rgba(132,94,247,0.1); padding: 3px 8px; border-radius: 4px; }
+.related-empty { text-align: center; padding: 24px; color: #6c757d; }
+.related-more { text-align: center; padding: 12px; color: #999; font-size: 12px; }
 .content-box { background: #f8f9fa; border-radius: 10px; padding: 16px; font-size: 13px; color: #495057; line-height: 1.8; }
 .content-scroll { max-height: 200px; overflow-y: auto; padding-right: 8px; }
 .content-scroll::-webkit-scrollbar { width: 6px; }
@@ -177,22 +208,29 @@ body {
 <nav class="top-nav">
   <a href="index.html" class="nav-brand">📊 A股工具箱</a>
   <a href="index.html">🏠 首页</a>
-  <a href="市场复盘_20260428_v3.html">📈 每日复盘</a>
-  <a href="选股策略_三合一.html">🎯 选股策略</a>
+  <a href="市场复盘_20260430_v4.html">📈 每日复盘</a>
+  <a href="选股策略_导航.html">🎯 选股策略</a>
+  <a href="选股策略_多策�?html">🔀 多策�?/a>
+  <a href="选股策略_自定义上�?html">📤 自定�?/a>
   <span class="nav-spacer"></span>
 </nav>
 
 <div class="container">
   <!-- 返回按钮 -->
-  <button class="back-btn" onclick="history.back()">← 返回</button>
+  <button class="back-btn" onclick="window.close()">�?返回</button>
 
   <!-- 股票头部信息 -->
   <div class="stock-header">
     <div class="stock-title">
-      <h1 id="stock-name">加载中...</h1>
+      <h1 id="stock-name">加载�?..</h1>
       <span class="stock-code" id="stock-code">-</span>
     </div>
-    <div class="stock-meta" id="stock-meta"></div>
+    <div class="stock-meta" id="stock-meta">
+      <div class="loading-indicator" id="loading-indicator" style="display:none;">
+        <div class="spinner"></div>
+        <span>正在加载详情...</span>
+      </div>
+    </div>
   </div>
 
   <!-- ========== 跟踪信息模块 ========== -->
@@ -206,7 +244,7 @@ body {
         <button class="save-text-btn" onclick="saveText()">💾 保存笔记</button>
       </div>
       <div class="textarea-wrap">
-        <textarea class="tracking-textarea" id="tracking-text" placeholder="在此记录股票的跟踪笔记、研究结论、买入理由、风险关注点等...&#10;&#10;支持多行输入，保存后可在下方查看完整历史记录。"></textarea>
+        <textarea class="tracking-textarea" id="tracking-text" placeholder="在此记录股票的跟踪笔记、研究结论、买入理由、风险关注点�?.."></textarea>
       </div>
       <div class="text-meta">
         <span class="char-count" id="char-count">0 字符</span>
@@ -220,7 +258,7 @@ body {
         <div class="file-tracking-label"><span class="icon">📁</span> 附件文件</div>
         <div class="file-actions">
           <button class="file-upload-btn" onclick="document.getElementById('file-input').click()">
-            <span>＋</span> 添加文件
+            <span>�?/span> 添加文件
           </button>
         </div>
       </div>
@@ -228,10 +266,10 @@ body {
       <div class="upload-area" onclick="document.getElementById('file-input').click()">
         <div class="icon">📤</div>
         <p>点击或拖拽文件到此处上传</p>
-        <p><span>支持 PDF、图片格式</span></p>
+        <p><span>支持 PDF、图片格�?/span></p>
       </div>
       <div class="tracking-list" id="tracking-list">
-        <div class="tracking-empty">暂无附件，点击上方区域上传</div>
+        <div class="tracking-empty">暂无附件，点击上方区域上�?/div>
       </div>
     </div>
   </div>
@@ -246,7 +284,7 @@ body {
         <div class="info-value highlight" id="val-industry-pe">-</div>
       </div>
       <div class="info-item">
-        <div class="info-label">市盈率 (TTM)</div>
+        <div class="info-label">市盈�?(TTM)</div>
         <div class="info-value" id="val-pe">-</div>
       </div>
       <div class="info-item">
@@ -261,31 +299,37 @@ body {
   </div>
 
   <!-- 概念主题 -->
-  <div class="basic-section">
-    <div class="section-subtitle">概念和主题</div>
+  <div class="basic-section" id="concept-section" style="display:none;">
+    <div class="section-subtitle">概念和主�?<span style="font-size:12px;color:#999;">(点击查看同类股票)</span></div>
     <div class="tag-cloud" id="concept-tags"></div>
   </div>
 
+  <!-- 同概念股�?-->
+  <div class="basic-section" id="related-stocks-section" style="display:none;">
+    <div class="section-subtitle" id="related-stocks-title">同概念股�?/div>
+    <div class="related-stocks-list" id="related-stocks-list"></div>
+  </div>
+
   <!-- 主营构成 -->
-  <div class="basic-section">
+  <div class="basic-section" id="business-section" style="display:none;">
     <div class="section-subtitle">主营构成</div>
     <div class="content-box content-scroll" id="val-business-type">-</div>
   </div>
 
   <!-- 主营业务 -->
-  <div class="basic-section">
+  <div class="basic-section" id="main-biz-section" style="display:none;">
     <div class="section-subtitle">主营业务</div>
     <div class="content-box content-scroll" id="val-main-business">-</div>
   </div>
 
   <!-- 公司亮点 -->
-  <div class="basic-section">
+  <div class="basic-section" id="highlight-section" style="display:none;">
     <div class="section-subtitle">公司亮点</div>
     <div class="highlight-box" id="val-highlight">-</div>
   </div>
 
   <!-- 风险提示 -->
-  <div class="basic-section">
+  <div class="basic-section" id="risk-section" style="display:none;">
     <div class="section-subtitle">风险提示</div>
     <div id="risk-container"></div>
   </div>
@@ -295,7 +339,7 @@ body {
 <div class="modal" id="preview-modal">
   <div class="modal-content" id="modal-content">
     <button class="modal-close" onclick="closeModal()">×</button>
-    <div class="loading" id="modal-loading">加载中...</div>
+    <div class="loading" id="modal-loading">加载�?..</div>
   </div>
 </div>
 
@@ -315,80 +359,177 @@ body {
 
 <script>
 // 股票数据
-let stockData = {};
-// 跟踪数据
+let stockInfo = null;
 let trackingData = {};
-
+let strategyData = null;  // 策略数据缓存
+let conceptMapping = null;  // 概念映射缓存
+let stockDetailIndex = null;  // 股票索引缓存
+let currentConcept = '';    // 当前选中的概�?
 // 获取股票代码
 function getStockCode() {
   const params = new URLSearchParams(window.location.search);
   return params.get('code') || '';
 }
 
-// 加载股票数据
-async function loadStockData() {
+// 缓存已加载的详情数据
+const detailCache = {};
+
+// 按需加载单个股票的详情数�?async function loadStockDetail(code) {
+  if (detailCache[code]) {
+    return detailCache[code];
+  }
+  
+  document.getElementById('loading-indicator').style.display = 'flex';
+  
   try {
-    const res = await fetch('stock_detail_data.json');
-    stockData = await res.json();
-    renderStockDetail();
+    // 分片文件索引映射 (�?00条一个文�?
+    const idx = parseInt(code) % 5500 / 100 | 0;
+    const filename = `/stock_data/stock_detail_${String(idx).padStart(3, '0')}.json`;
+    const res = await fetch(filename);
+    const data = await res.json();
+    
+    const info = data[code];
+    if (info) {
+      detailCache[code] = info;
+    }
+    
+    document.getElementById('loading-indicator').style.display = 'none';
+    return info;
+  } catch (e) {
+    console.error('加载详情失败:', e);
+    document.getElementById('loading-indicator').style.display = 'none';
+    return null;
+  }
+}
+
+// 加载策略数据
+async function loadStrategyData() {
+  if (strategyData) return;  // 已缓�?  try {
+    const res = await fetch('/strategy_data.json');
+    strategyData = await res.json();
+  } catch (e) {
+    console.error('加载策略数据失败:', e);
+  }
+}
+
+// 加载概念映射
+async function loadConceptMapping() {
+  if (conceptMapping) return;  // 已缓�?  try {
+    const res = await fetch('/concept_mapping.json?t=' + Date.now());
+    conceptMapping = await res.json();
+  } catch (e) {
+    console.error('加载概念映射失败:', e);
+    conceptMapping = {};
+  }
+}
+
+// 加载股票数据（快速加载基本信息）
+async function loadStockData() {
+  const code = getStockCode();
+  
+  if (!code) {
+    document.getElementById('stock-name').textContent = '未提供股票代�?;
+    return;
+  }
+  
+  try {
+    // 先显示代码（快速）
+    document.getElementById('stock-code').textContent = code;
+    
+    // 直接从项目目录加载基本信�?    const res = await fetch('/stock_detail_index.json');
+    const index = await res.json();
+    // 保存到缓存变�?    stockDetailIndex = index;
+    
+    const basicInfo = index[code];
+    if (basicInfo) {
+      document.getElementById('stock-name').textContent = basicInfo['名称'] || code;
+      document.getElementById('val-industry-pe').textContent = basicInfo['行业PE'] || '-';
+      document.getElementById('val-industry').textContent = basicInfo['一二级行业'] || '-';
+    }
+    
+    // 加载跟踪数据（localStorage�?    loadTrackingData(code);
+
+    // 异步加载策略数据和概念映�?    loadStrategyData();
+    loadConceptMapping();
+    
+    // 异步加载完整详情
+    const fullInfo = await loadStockDetail(code);
+    if (fullInfo) {
+      renderFullDetail(fullInfo);
+    } else {
+      document.getElementById('stock-name').textContent = basicInfo?.['名称'] || code + ' (部分数据)';
+    }
+    
   } catch (e) {
     console.error('加载数据失败:', e);
     document.getElementById('stock-name').textContent = '数据加载失败';
   }
 }
 
-// 渲染股票详情
-function renderStockDetail() {
-  const code = getStockCode();
-  const info = stockData[code];
-  
-  if (!info) {
-    document.getElementById('stock-name').textContent = '股票不存在';
-    return;
-  }
-
-  // 股票名称和代码
-  document.getElementById('stock-name').textContent = info['名称'] || '-';
-  document.getElementById('stock-code').textContent = code;
-
-  // 加载跟踪数据
-  loadTrackingData(code);
-
+// 渲染完整详情（按需加载后调用）
+function renderFullDetail(info) {
   // 基本信息
-  setVal('val-industry-pe', info['行业PE'] || '-', 'highlight');
   setVal('val-pe', info['市盈(TTM)'] || '-');
-  setVal('val-industry', info['一二级行业'] || '-');
   setVal('val-category', info['品类'] || '-');
-
+  
   // 概念标签
-  const concepts = (info['概念和主题'] || '').split(/[,，、\s]+/).filter(Boolean);
-  const tagHtml = concepts.map(c => `<span class="concept-tag">${c}</span>`).join('');
-  document.getElementById('concept-tags').innerHTML = tagHtml || '<span style="color:#868e96">暂无概念</span>';
-
+  const concepts = (info['概念和主�?] || '').split(/[,，、\s]+/).filter(Boolean);
+  if (concepts.length > 0) {
+    document.getElementById('concept-section').style.display = 'block';
+    // 保存概念列表
+    window.stockConcepts = concepts;
+    // 保存当前股票代码
+    window.currentStockCode = getStockCode();
+    // 生成可点击的标签（先不显示数字）
+    const tagHtml = concepts.map(c => {
+      const count = conceptMapping && conceptMapping[c] ? conceptMapping[c].length : '...';
+      return `<span class="concept-tag" data-concept="${c}">${c} (${count})</span>`;
+    }).join('');
+    document.getElementById('concept-tags').innerHTML = tagHtml;
+    // 添加点击事件
+    document.querySelectorAll('.concept-tag').forEach(tag => {
+      tag.addEventListener('click', handleConceptClick);
+    });
+    
+    // 如果概念映射还未加载，异步更新数�?    if (!conceptMapping) {
+      loadConceptMapping().then(() => {
+        updateConceptCounts(concepts);
+      });
+    }
+  }
+  
   // 主营构成
-  setVal('val-business-type', info['主营构成'] || '-');
-
+  if (info['主营构成']) {
+    document.getElementById('business-section').style.display = 'block';
+    setVal('val-business-type', info['主营构成']);
+  }
+  
   // 主营业务
-  setVal('val-main-business', info['主营业务'] || '-');
-
+  if (info['主营业务']) {
+    document.getElementById('main-biz-section').style.display = 'block';
+    setVal('val-main-business', info['主营业务']);
+  }
+  
   // 公司亮点
-  const highlight = info['公司亮点'] || '-';
-  document.getElementById('val-highlight').textContent = highlight;
-
+  if (info['公司亮点']) {
+    document.getElementById('highlight-section').style.display = 'block';
+    document.getElementById('val-highlight').textContent = info['公司亮点'];
+  }
+  
   // 风险提示
-  const risk = info['风险提示'] || '';
-  const riskContainer = document.getElementById('risk-container');
-  if (risk) {
-    riskContainer.innerHTML = `<div class="warning-box"><span class="icon">⚠️</span><span class="text">${risk}</span></div>`;
-  } else {
-    riskContainer.innerHTML = '<div class="content-box">暂无风险提示</div>';
+  if (info['风险提示']) {
+    document.getElementById('risk-section').style.display = 'block';
+    document.getElementById('risk-container').innerHTML = 
+      `<div class="warning-box"><span class="icon">⚠️</span><span class="text">${info['风险提示']}</span></div>`;
   }
 }
 
 function setVal(id, val, extraClass = '') {
   const el = document.getElementById(id);
-  el.textContent = val || '-';
-  if (extraClass) el.classList.add(extraClass);
+  if (el) {
+    el.textContent = val || '-';
+    if (extraClass) el.classList.add(extraClass);
+  }
 }
 
 // ========== 跟踪数据管理 ==========
@@ -432,7 +573,7 @@ function updateCharCount() {
 function updateLastSaveTime() {
   const el = document.getElementById('last-save-time');
   if (trackingData.textDate) {
-    el.textContent = `最后保存: ${trackingData.textDate}`;
+    el.textContent = `最后保�? ${trackingData.textDate}`;
   } else {
     el.textContent = '';
   }
@@ -456,7 +597,7 @@ function closeTextModal() {
 function renderFileList() {
   const list = document.getElementById('tracking-list');
   if (!trackingData.files || trackingData.files.length === 0) {
-    list.innerHTML = '<div class="tracking-empty">暂无附件，点击上方区域上传</div>';
+    list.innerHTML = '<div class="tracking-empty">暂无附件，点击上方区域上�?/div>';
     return;
   }
   list.innerHTML = trackingData.files.map((f, i) => `
@@ -473,12 +614,12 @@ function renderFileList() {
 
 function getFileIcon(type) {
   if (type.includes('pdf')) return '📄';
-  if (type.includes('image')) return '🖼️';
+  if (type.includes('image')) return '🖼�?;
   return '📎';
 }
 
 function deleteFile(index) {
-  if (confirm('确定要删除这个文件吗？')) {
+  if (confirm('确定要删除这个文件吗�?)) {
     trackingData.files.splice(index, 1);
     saveTrackingData();
     renderFileList();
@@ -524,7 +665,7 @@ function previewFile(index) {
   } else {
     content.innerHTML = `
       <button class="modal-close" onclick="closeModal()">×</button>
-      <div class="loading">无法预览此文件类型: ${file.name}</div>
+      <div class="loading">无法预览此文件类�? ${file.name}</div>
     `;
   }
 }
@@ -536,7 +677,7 @@ function closeModal() {
 // 文件上传事件
 document.getElementById('file-input').addEventListener('change', function(e) {
   handleFiles(e.target.files);
-  e.target.value = ''; // 允许重复上传同一文件
+  e.target.value = '';
 });
 
 // 文本输入监听
@@ -561,8 +702,100 @@ uploadArea.addEventListener('drop', function(e) {
   handleFiles(e.dataTransfer.files);
 });
 
-// 初始化
-loadStockData();
+// 初始�?loadStockData();
+
+// 更新概念标签的数�?async function updateConceptCounts(concepts) {
+  if (!conceptMapping) {
+    await loadConceptMapping();
+  }
+  
+  concepts.forEach(concept => {
+    const tag = document.querySelector(`.concept-tag[data-concept="${concept}"]`);
+    if (tag && conceptMapping[concept]) {
+      const count = conceptMapping[concept].length;
+      tag.textContent = `${concept} (${count})`;
+    }
+  });
+}
+
+// ========== 概念股票关联 ==========
+// 处理概念标签点击
+function handleConceptClick(e) {
+  const concept = e.target.dataset.concept;
+  const currentCode = window.currentStockCode;
+
+  // 切换选中状�?  document.querySelectorAll('.concept-tag').forEach(tag => {
+    tag.classList.remove('active');
+  });
+  e.target.classList.add('active');
+
+  // 查找同概念的策略股票
+  showRelatedStocks(concept, currentCode);
+}
+
+// 显示同概念股票（使用概念映射，高性能�?async function showRelatedStocks(concept, excludeCode) {
+  const section = document.getElementById('related-stocks-section');
+  const list = document.getElementById('related-stocks-list');
+  const title = document.getElementById('related-stocks-title');
+  // 确保策略数据已加载
+  await loadStrategyData();
+  
+  if (!conceptMapping || !stockDetailIndex) {
+    section.style.display = 'none';
+    return;
+  }
+  
+  // 从概念映射获取同概念的股票代码列�?  const codes = conceptMapping[concept] || [];
+  const filteredCodes = codes.filter(c => c !== excludeCode);
+  
+  title.textContent = `"${concept}" 相关股票 (${filteredCodes.length}�?`;
+  
+  if (filteredCodes.length > 0) {
+    section.style.display = 'block';
+    
+    // 构建股票列表HTML
+    const stockHtml = filteredCodes.slice(0, 30).map(code => {
+      const basicInfo = stockDetailIndex[code] || {};
+      const name = basicInfo.name || code;
+      
+      // 查找策略信息
+      let strategies = [];
+      if (strategyData) {
+        const s = strategyData.find(item => String(item.code).trim() === String(code).trim());
+        if (s) {
+          if (s.s1) strategies.push('持股增长');
+          if (s.s2) strategies.push('盈利质量');
+          if (s.s3) strategies.push('全速前进');
+          if (s.s4) strategies.push('机构持股增长');
+        }
+      }
+      
+      return `<div class="related-stock-item" onclick="openStockDetail('${code}')">
+        <span class="stock-name">${name}</span>
+        <span class="stock-code">${code}</span>
+        ${strategies.length > 0 ? `<span class="stock-strategies">${strategies.join(', ')}</span>` : '<span class="stock-strategies" style="color:#999;">未命�?/span>'}
+      </div>`;
+    }).join('');
+    
+    list.innerHTML = stockHtml + (filteredCodes.length > 30 ? `<div class="related-more">还有 ${filteredCodes.length - 30} �?..</div>` : '');
+  } else {
+    section.style.display = 'block';
+    list.innerHTML = '<div class="related-empty">暂无同概念股�?/div>';
+  }
+}
+
+// 保留原函数以备需要（不再使用，因为概念映射已提供快速查找）
+async function findRelatedByConcept(concept, excludeCode) {
+  // 已重写为 showRelatedStocks() 使用 conceptMapping
+  return [];
+}
+
+// 打开股票详情�?function openStockDetail(code) {
+  window.open(`/stock_detail.html?code=${code}`, '_blank');
+}
 </script>
 </body>
 </html>
+
+
+
