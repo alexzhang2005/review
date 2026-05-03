@@ -773,7 +773,7 @@ function handleConceptClick(e) {
       return `<div class="related-stock-item" onclick="openStockDetail('${code}')">
         <span class="stock-name">${name}</span>
         <span class="stock-code">${code}</span>
-        ${strategies.length > 0 ? `<span class="stock-strategies">${strategies.join(', ')}</span>` : '<span class="stock-strategies" style="color:#999;">未命�?/span>'}
+        ${strategies.length > 0 ? `<span class="stock-strategies">${strategies.join('、')}</span>` : '<span class="stock-strategies" style="color:#999;">未命�?/span>'}
       </div>`;
     }).join('');
     
